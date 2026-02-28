@@ -3,167 +3,153 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Codes – Phonex Institute</title>
-    <meta name="description" content="Generate and print QR codes for all students at Phonex Institute.">
-    <link rel="stylesheet" href="../css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>QR Codes – Phoenix Institute</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- No client-side QR library needed – images served via api.qrserver.com -->
 </head>
 
-<body>
+<body class="bg-gray-950 text-gray-100 antialiased font-sans">
+    <div class="lg:flex lg:h-screen">
+        <div id="overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="closeSidebar()"></div>
 
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <div class="app-layout">
-
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <div class="logo-icon">🎓</div>
-                <div class="logo-text">
-                    <h2>Phonex</h2>
-                    <p>Institute System</p>
+        <aside id="sidebar"
+            class="fixed lg:sticky top-0 left-0 h-screen w-64 bg-gray-900 border-r border-gray-800 flex flex-col z-50 -translate-x-full lg:translate-x-0 transition-transform duration-300 shrink-0">
+            <div class="p-5 border-b border-gray-800 flex items-center gap-3">
+                <div
+                    class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg text-lg">
+                    🎓</div>
+                <div>
+                    <div class="font-bold text-white text-sm">Phoenix Institute</div>
+                    <div class="text-[11px] text-gray-500">Management System</div>
                 </div>
             </div>
-            <nav class="sidebar-nav">
-                <div class="nav-section-title">Main</div>
-                <a href="../index.html" class="nav-link">
-                    <div class="nav-icon">📊</div> Dashboard
-                </a>
-                <a href="students.html" class="nav-link">
-                    <div class="nav-icon">👨‍🎓</div> Students
-                </a>
-                <a href="attendance.html" class="nav-link">
-                    <div class="nav-icon">📋</div> Attendance
-                </a>
-                <a href="payments.html" class="nav-link">
-                    <div class="nav-icon">💳</div> Payments
-                </a>
-                <div class="nav-section-title" style="margin-top:8px">Scanner</div>
-                <a href="scanner.html" class="nav-link">
-                    <div class="nav-icon">📷</div> QR Scanner
-                </a>
-                <a href="qr-codes.html" class="nav-link active">
-                    <div class="nav-icon">🔲</div> QR Codes
-                </a>
+            <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
+                <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-3 pb-2">Main</p>
+                <a href="../index.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">📊</span>Dashboard</a>
+                <a href="students.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">👨‍🎓</span>Students</a>
+                <a href="attendance.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">📋</span>Attendance</a>
+                <a href="payments.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">💳</span>Payments</a>
+                <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-4 pb-2">Scanner</p>
+                <a href="scanner.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">📷</span>QR Scanner</a>
+                <a href="qr-codes.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold"><span
+                        class="w-7 text-center text-lg">🔲</span>QR Codes</a>
             </nav>
-            <div class="sidebar-footer">
-                <div class="sidebar-user">
-                    <div class="user-avatar">A</div>
+            <div class="p-4 border-t border-gray-800">
+                <div class="flex items-center gap-3 px-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold shrink-0">
+                        A</div>
                     <div>
-                        <div style="font-size:13px;font-weight:600">Admin</div>
-                        <div style="font-size:11px;color:var(--text-muted)">Institute Manager</div>
+                        <div class="text-xs font-semibold text-white">Admin</div>
+                        <div class="text-[10px] text-gray-500">Institute Manager</div>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <!-- Main -->
-        <div class="main-content">
-            <div class="topbar">
-                <div style="display:flex;align-items:center;gap:12px">
-                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-                    <div class="topbar-left">
-                        <h1>Student QR Codes</h1>
-                        <p>Generate and print QR codes for attendance</p>
-                    </div>
+        <div class="flex-1 flex flex-col min-h-screen lg:overflow-y-auto">
+            <header
+                class="lg:hidden sticky top-0 z-30 bg-gray-900/95 backdrop-blur border-b border-gray-800 px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()"
+                        class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-800 text-gray-300">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 5h12M3 9h12M3 13h12" />
+                        </svg>
+                    </button>
+                    <span class="font-bold text-white">QR Codes</span>
                 </div>
-                <div class="topbar-right">
-                    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print All</button>
+                <button onclick="window.print()"
+                    class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg font-medium transition-colors">🖨️
+                    Print</button>
+            </header>
+            <header
+                class="hidden lg:flex sticky top-0 z-30 bg-gray-900/80 backdrop-blur border-b border-gray-800 px-8 py-4 items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-bold text-white">QR Codes</h1>
+                    <p class="text-sm text-gray-500">Generate & print student QR codes for attendance</p>
                 </div>
-            </div>
+                <button onclick="window.print()"
+                    class="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-xl text-sm font-medium transition-colors">🖨️
+                    Print All</button>
+            </header>
 
-            <div class="page-content">
-
+            <div class="flex-1 p-4 lg:p-8 pb-24 lg:pb-8">
                 <!-- Filters -->
-                <div class="filters-bar" style="margin-bottom:20px">
-                    <div class="search-input-wrapper" style="max-width:280px">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search students…">
+                <div class="flex flex-wrap gap-2 mb-5">
+                    <div class="relative flex-1 min-w-[160px]">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">🔍</span>
+                        <input id="q" type="text" placeholder="Search students…" oninput="filter()"
+                            class="w-full bg-gray-900 border border-gray-700 rounded-xl pl-9 pr-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors">
                     </div>
-                    <select class="form-control" id="filterSubject" style="width:auto;min-width:130px">
+                    <select id="fSub" onchange="filter()"
+                        class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none">
                         <option value="">All Subjects</option>
-                        <option value="Science">Science</option>
-                        <option value="Maths">Maths</option>
-                        <option value="Both">Both</option>
+                        <option>Science</option>
+                        <option>Maths</option>
                     </select>
-                    <select class="form-control" id="filterGrade" style="width:auto;min-width:120px">
+                    <select id="fGrade" onchange="filter()"
+                        class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none">
                         <option value="">All Grades</option>
-                        <option value="6">Grade 6</option>
-                        <option value="7">Grade 7</option>
-                        <option value="8">Grade 8</option>
-                        <option value="9">Grade 9</option>
-                        <option value="10">Grade 10</option>
-                        <option value="11">Grade 11</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                        <option>11</option>
                     </select>
                 </div>
 
-                <div id="qrGrid"
-                    style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">
-                    <div class="page-loading" style="grid-column:1/-1">
-                        <div class="loading-spinner"></div> Loading students…
+                <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
+                    <div class="col-span-full flex items-center justify-center py-12 gap-2 text-gray-600 text-sm">
+                        <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z" />
+                        </svg>
+                        Loading students…
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 backdrop-blur-sm z-40">
+        <div class="flex items-center justify-around px-1 py-1">
+            <a href="../index.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">📊</span><span class="text-[10px]">Home</span></a>
+            <a href="students.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">👨‍🎓</span><span class="text-[10px]">Students</span></a>
+            <a href="scanner.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">📷</span><span class="text-[10px]">Scan</span></a>
+            <a href="attendance.html"
+                class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">📋</span><span class="text-[10px]">Attend.</span></a>
+            <a href="payments.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">💳</span><span class="text-[10px]">Payments</span></a>
+        </div>
+    </nav>
+
     <style>
-        /* QR card print styles */
-        .qr-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            transition: all var(--transition);
-            cursor: default;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .qr-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent), var(--accent-light));
-        }
-
-        .qr-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-glow);
-            border-color: var(--border-active);
-        }
-
-        .qr-card .student-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 0;
-        }
-
-        .qr-card canvas {
-            border-radius: 8px;
-        }
-
-        .qr-card .download-btn {
-            width: 100%;
-        }
-
         @media print {
 
             .sidebar,
-            .topbar,
+            header,
+            nav,
             .filters-bar,
-            .download-btn {
+            button {
                 display: none !important;
             }
 
@@ -171,134 +157,130 @@
                 margin-left: 0 !important;
             }
 
-            #qrGrid {
-                grid-template-columns: repeat(3, 1fr) !important;
+            #grid {
+                grid-template-columns: repeat(4, 1fr) !important;
                 gap: 8px !important;
-                padding: 0 !important;
             }
 
-            .qr-card {
-                break-inside: avoid;
-                border: 1px solid #ccc;
-            }
-
-            .qr-card canvas {
-                width: 160px !important;
-                height: 160px !important;
+            .qr-card img {
+                width: 140px !important;
+                height: 140px !important;
             }
 
             body {
                 background: white !important;
                 color: black !important;
             }
+
+            .qr-card {
+                border: 1px solid #ccc !important;
+                background: white !important;
+                break-inside: avoid;
+            }
+
+            .qr-card .student-name {
+                color: black !important;
+            }
+
+            .qr-card .student-sub {
+                color: #555 !important;
+            }
         }
     </style>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { firebaseConfig } from "../js/firebase-config.js";
+        import { getSubjects } from "../js/app.js";
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        let allStudents = [];
+        const db = getFirestore(initializeApp(firebaseConfig));
+        let all = [];
 
-        async function loadStudents() {
-            const grid = document.getElementById('qrGrid');
+        async function load() {
+            const snap = await getDocs(collection(db, 'students'));
+            all = []; snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+            all.sort((a, b) => (a.firstName || '').localeCompare(b.firstName || ''));
+            renderCards(all);
+        }
+
+        function renderCards(list) {
+            const g = document.getElementById('grid');
+            if (!list.length) {
+                g.innerHTML = `<div class="col-span-full text-center py-16 text-gray-600">
+      <div class="text-4xl mb-3 opacity-30">🔲</div>
+      <div>No students found. <a href="students.html" class="text-indigo-400 hover:underline">Add students first</a></div>
+    </div>`; return;
+            }
+
+            g.innerHTML = list.map(s => {
+                const subs = getSubjects(s);
+                const subTxt = subs.join(' & ');
+                const subIcon = subs.includes('Science') && subs.includes('Maths') ? '🔬📐' : subs[0] === 'Science' ? '🔬' : '📐';
+                // QR code rendered by the free qrserver.com API — no JS library needed
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(s.id)}&bgcolor=ffffff&color=1e1b4b&margin=6&format=png`;
+                const dlUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(s.id)}&bgcolor=ffffff&color=1e1b4b&margin=6&format=png`;
+                return `<div class="qr-card bg-gray-900 border border-gray-800 rounded-2xl p-3 flex flex-col items-center gap-2 hover:border-indigo-500/40 hover:-translate-y-1 transition-all duration-200">
+      <div class="w-full text-center">
+        <div class="student-name font-semibold text-white text-xs leading-tight">${s.firstName} ${s.lastName}</div>
+        <div class="student-sub text-[10px] text-gray-500 mt-0.5">${subIcon} Grade ${s.grade} • ${subTxt}</div>
+      </div>
+      <div class="bg-white p-2 rounded-xl flex items-center justify-center" style="width:164px;height:164px">
+        <img
+          src="${qrUrl}"
+          width="150" height="150"
+          alt="QR for ${s.firstName}"
+          data-dlurl="${dlUrl}"
+          class="rounded block"
+          onload="this.closest('.qr-card').querySelector('button').disabled=false"
+        >
+      </div>
+      <div class="text-[9px] text-gray-700 font-mono break-all text-center leading-tight max-w-full">${s.id.slice(0, 16).toUpperCase()}</div>
+      <button
+        onclick="dl('${s.id}','${s.firstName} ${s.lastName}')"
+        disabled
+        class="w-full py-1.5 rounded-xl bg-gray-800 hover:bg-indigo-600 text-gray-400 hover:text-white text-[11px] font-medium transition-all disabled:opacity-40 disabled:cursor-wait">
+        ⬇ Download
+      </button>
+    </div>`;
+            }).join('');
+        }
+
+        // Download: fetch image as blob so it saves as a file (not just opens in browser)
+        window.dl = async function (id, name) {
+            const img = document.querySelector(`img[data-dlurl*="${id}"]`);
+            const dlUrl = img?.dataset?.dlurl;
+            if (!dlUrl) { alert('QR not ready — wait a moment then try again.'); return; }
             try {
-                const snap = await getDocs(query(collection(db, 'students'), orderBy('createdAt', 'desc')));
-                allStudents = [];
-                snap.forEach(d => allStudents.push({ id: d.id, ...d.data() }));
-                renderCards(allStudents);
-            } catch (err) {
-                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
-      <div class="empty-icon">⚠️</div>
-      <h3>Firebase not configured</h3>
-      <p>Please set up your Firebase credentials in <code>js/firebase-config.js</code></p>
-    </div>`;
+                const res = await fetch(dlUrl);
+                if (!res.ok) throw new Error(res.status);
+                const blob = await res.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = `QR_${name.replace(/\s+/g, '_')}.png`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+            } catch (e) {
+                // Fallback: open in new tab so user can long-press save on mobile
+                window.open(dlUrl, '_blank');
             }
-        }
-
-        function renderCards(students) {
-            const grid = document.getElementById('qrGrid');
-            if (students.length === 0) {
-                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
-      <div class="empty-icon">🔲</div>
-      <h3>No Students Found</h3>
-      <p>Add students first, then generate their QR codes.</p>
-    </div>`;
-                return;
-            }
-
-            grid.innerHTML = students.map(s => `
-    <div class="qr-card" id="card-${s.id}">
-      <div>
-        <div class="student-name">${s.firstName} ${s.lastName}</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
-          Grade ${s.grade} • ${s.subject}
-        </div>
-      </div>
-      <canvas id="qr-${s.id}" style="width:180px;height:180px"></canvas>
-      <div style="font-size:10px;color:var(--text-muted);word-break:break-all;max-width:200px">
-        ${s.id.toUpperCase()}
-      </div>
-      <div style="display:flex;gap:6px;width:100%">
-        <button class="btn btn-ghost btn-sm download-btn" onclick="downloadQr('${s.id}','${s.firstName} ${s.lastName}')">
-          ⬇ Download
-        </button>
-      </div>
-    </div>
-  `).join('');
-
-            // Generate QR codes
-            students.forEach(s => {
-                const canvas = document.getElementById(`qr-${s.id}`);
-                QRCode.toCanvas(canvas, s.id, {
-                    width: 180,
-                    margin: 1,
-                    color: { dark: '#1e1e2e', light: '#ffffff' }
-                }, err => {
-                    if (err) console.error('QR gen error:', err);
-                });
-            });
-        }
-
-        // ── Download individual QR ───────────────────────────────────
-        window.downloadQr = function (studentId, name) {
-            const canvas = document.getElementById(`qr-${studentId}`);
-            const link = document.createElement('a');
-            link.download = `QR_${name.replace(/\s+/g, '_')}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
         };
 
-        // ── Filters ──────────────────────────────────────────────────
-        function applyFilters() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const subject = document.getElementById('filterSubject').value;
-            const grade = document.getElementById('filterGrade').value;
 
-            const filtered = allStudents.filter(s => {
-                const matchSearch = !search || `${s.firstName} ${s.lastName}`.toLowerCase().includes(search);
-                const matchSubject = !subject || s.subject === subject || s.subject === 'Both';
-                const matchGrade = !grade || String(s.grade) === grade;
-                return matchSearch && matchSubject && matchGrade;
-            });
-            renderCards(filtered);
-        }
+        window.filter = function () {
+            const q = document.getElementById('q').value.toLowerCase();
+            const fs = document.getElementById('fSub').value;
+            const fg = document.getElementById('fGrade').value;
+            renderCards(all.filter(s => {
+                const subs = getSubjects(s);
+                return (!q || `${s.firstName} ${s.lastName}`.toLowerCase().includes(q))
+                    && (!fs || subs.includes(fs))
+                    && (!fg || String(s.grade) === fg);
+            }));
+        };
 
-        ['searchInput', 'filterSubject', 'filterGrade'].forEach(id =>
-            document.getElementById(id)?.addEventListener('input', applyFilters)
-        );
-
-        // ── Init ─────────────────────────────────────────────────────
-        const mobileBtn = document.getElementById('mobileMenuBtn');
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        mobileBtn?.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('open'); });
-        overlay?.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('open'); });
-
-        loadStudents();
+        load();
     </script>
 </body>
 

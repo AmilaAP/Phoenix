@@ -3,365 +3,297 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Scanner – Phonex Institute</title>
-    <meta name="description" content="Scan student QR codes to record attendance at Phonex Institute.">
-    <link rel="stylesheet" href="../css/style.css">
-    <!-- html5-qrcode library -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>QR Scanner – Phoenix Institute</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 
-<body>
+<body class="bg-gray-950 text-gray-100 antialiased font-sans">
+    <div class="lg:flex lg:h-screen">
 
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <div id="overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="closeSidebar()"></div>
 
-    <div class="app-layout">
-
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <div class="logo-icon">🎓</div>
-                <div class="logo-text">
-                    <h2>Phonex</h2>
-                    <p>Institute System</p>
+        <aside id="sidebar"
+            class="fixed lg:sticky top-0 left-0 h-screen w-64 bg-gray-900 border-r border-gray-800 flex flex-col z-50 -translate-x-full lg:translate-x-0 transition-transform duration-300 shrink-0">
+            <div class="p-5 border-b border-gray-800 flex items-center gap-3">
+                <div
+                    class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg text-lg">
+                    🎓</div>
+                <div>
+                    <div class="font-bold text-white text-sm">Phoenix Institute</div>
+                    <div class="text-[11px] text-gray-500">Management System</div>
                 </div>
             </div>
-            <nav class="sidebar-nav">
-                <div class="nav-section-title">Main</div>
-                <a href="../index.html" class="nav-link">
-                    <div class="nav-icon">📊</div> Dashboard
-                </a>
-                <a href="students.html" class="nav-link">
-                    <div class="nav-icon">👨‍🎓</div> Students
-                </a>
-                <a href="attendance.html" class="nav-link">
-                    <div class="nav-icon">📋</div> Attendance
-                </a>
-                <a href="payments.html" class="nav-link">
-                    <div class="nav-icon">💳</div> Payments
-                </a>
-                <div class="nav-section-title" style="margin-top:8px">Scanner</div>
-                <a href="scanner.html" class="nav-link active">
-                    <div class="nav-icon">📷</div> QR Scanner
-                </a>
-                <a href="qr-codes.html" class="nav-link">
-                    <div class="nav-icon">🔲</div> QR Codes
-                </a>
+            <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
+                <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-3 pb-2">Main</p>
+                <a href="../index.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">📊</span>Dashboard</a>
+                <a href="students.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">👨‍🎓</span>Students</a>
+                <a href="attendance.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">📋</span>Attendance</a>
+                <a href="payments.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">💳</span>Payments</a>
+                <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-4 pb-2">Scanner</p>
+                <a href="scanner.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold"><span
+                        class="text-lg w-7 text-center">📷</span>QR Scanner</a>
+                <a href="qr-codes.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">🔲</span>QR Codes</a>
             </nav>
-            <div class="sidebar-footer">
-                <div class="sidebar-user">
-                    <div class="user-avatar">A</div>
+            <div class="p-4 border-t border-gray-800">
+                <div class="flex items-center gap-3 px-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold shrink-0">
+                        A</div>
                     <div>
-                        <div style="font-size:13px;font-weight:600">Admin</div>
-                        <div style="font-size:11px;color:var(--text-muted)">Institute Manager</div>
+                        <div class="text-xs font-semibold text-white">Admin</div>
+                        <div class="text-[10px] text-gray-500">Institute Manager</div>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <!-- Main -->
-        <div class="main-content">
-            <div class="topbar">
-                <div style="display:flex;align-items:center;gap:12px">
-                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-                    <div class="topbar-left">
-                        <h1>QR Scanner</h1>
-                        <p id="scanDate">Loading date…</p>
-                    </div>
+        <div class="flex-1 flex flex-col min-h-screen lg:overflow-y-auto">
+
+            <header
+                class="lg:hidden sticky top-0 z-30 bg-gray-900/95 backdrop-blur border-b border-gray-800 px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()"
+                        class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-800 text-gray-300">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 5h12M3 9h12M3 13h12" />
+                        </svg>
+                    </button>
+                    <span class="font-bold text-white">QR Scanner</span>
                 </div>
-                <div class="topbar-right">
-                    <span class="badge badge-info" id="scanCount">0 Scanned Today</span>
+                <span
+                    class="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-full font-semibold"
+                    id="scanCount2">0 Today</span>
+            </header>
+
+            <header
+                class="hidden lg:flex sticky top-0 z-30 bg-gray-900/80 backdrop-blur border-b border-gray-800 px-8 py-4 items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-bold text-white">QR Scanner</h1>
+                    <p class="text-sm text-gray-500" id="scanDate">—</p>
                 </div>
-            </div>
+                <span
+                    class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1 rounded-full text-sm font-semibold"
+                    id="scanCount">0 Scanned Today</span>
+            </header>
 
-            <div class="page-content">
+            <div class="flex-1 p-4 lg:p-8 pb-24 lg:pb-8">
+                <div class="grid lg:grid-cols-2 gap-4 lg:gap-6 items-start">
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-
-                    <!-- Scanner Panel -->
-                    <div>
-                        <div class="card" style="margin-bottom:16px">
-                            <div class="card-header">
+                    <!-- Scanner panel -->
+                    <div class="space-y-4">
+                        <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+                            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-800">
                                 <div>
-                                    <div class="card-title">📷 Camera Scanner</div>
-                                    <div class="card-subtitle">Point camera at student's QR code</div>
+                                    <h2 class="font-semibold text-white text-sm">📷 Camera Scanner</h2>
+                                    <p class="text-xs text-gray-500 mt-0.5">Point at student QR code</p>
                                 </div>
-                                <div style="display:flex;gap:8px">
-                                    <button class="btn btn-primary btn-sm" id="startBtn" onclick="startScanner()">Start
+                                <div class="flex gap-2">
+                                    <button id="startBtn" onclick="startScan()"
+                                        class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors">Start
                                         Camera</button>
-                                    <button class="btn btn-ghost btn-sm" id="stopBtn" onclick="stopScanner()"
-                                        style="display:none">Stop</button>
+                                    <button id="stopBtn" onclick="stopScan()"
+                                        class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-medium transition-colors hidden">Stop</button>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <!-- QR Reader container -->
-                                <div id="reader" style="width:100%;min-height:260px"></div>
-                                <p style="font-size:11px;color:var(--text-muted);margin-top:12px;text-align:center">
-                                    📱 This page works best on mobile — open it in your phone's browser
-                                </p>
+                            <div class="p-4">
+                                <div id="reader" class="w-full bg-gray-950 rounded-xl overflow-hidden"
+                                    style="min-height:260px"></div>
+                                <p class="text-center text-[11px] text-gray-600 mt-3">📱 Best used on mobile – open this
+                                    page on your phone's browser</p>
                             </div>
                         </div>
 
-                        <!-- Scan Result -->
-                        <div id="scanResultContainer" style="display:none"></div>
+                        <!-- Scan result -->
+                        <div id="resultBox" class="hidden"></div>
 
-                        <!-- Manual Entry fallback -->
-                        <div class="card" style="margin-top:16px">
-                            <div class="card-header">
-                                <div class="card-title">⌨️ Manual Student ID Entry</div>
-                            </div>
-                            <div class="card-body" style="display:flex;gap:10px">
-                                <input type="text" class="form-control" id="manualId"
-                                    placeholder="Paste or type Student ID…" style="flex:1">
-                                <button class="btn btn-success" onclick="manualMark()">Mark Present</button>
+                        <!-- Manual entry -->
+                        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">⌨️ Manual Entry
+                            </p>
+                            <div class="flex gap-2">
+                                <input id="manualId" placeholder="Paste Student ID…"
+                                    class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors">
+                                <button onclick="markManual()"
+                                    class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shrink-0">Mark</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Today's Attendance Log -->
-                    <div class="card" style="height:fit-content">
-                        <div class="card-header">
+                    <!-- Today log -->
+                    <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+                        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-800">
                             <div>
-                                <div class="card-title">📋 Today's Log</div>
-                                <div class="card-subtitle" id="logSubtitle">0 students present</div>
+                                <h2 class="font-semibold text-white text-sm">📋 Today's Log</h2>
+                                <p class="text-xs text-gray-500 mt-0.5" id="logSub">0 students present</p>
                             </div>
-                            <button class="btn btn-ghost btn-sm" onclick="refreshLog()">↻ Refresh</button>
+                            <button onclick="refreshLog()"
+                                class="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors">↻
+                                Refresh</button>
                         </div>
-                        <div class="card-body" id="todayLog" style="max-height:500px;overflow-y:auto">
-                            <div class="page-loading">
-                                <div class="loading-spinner"></div>
+                        <div class="divide-y divide-gray-800 max-h-[500px] overflow-y-auto" id="logList">
+                            <div class="flex items-center justify-center py-8 gap-2 text-gray-600 text-sm">
+                                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4" />
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z" />
+                                </svg>
+                                Loading…
                             </div>
                         </div>
                     </div>
 
                 </div>
-
             </div>
         </div>
     </div>
 
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 backdrop-blur-sm z-40">
+        <div class="flex items-center justify-around px-1 py-1">
+            <a href="../index.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">📊</span><span class="text-[10px]">Home</span></a>
+            <a href="students.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">👨‍🎓</span><span class="text-[10px]">Students</span></a>
+            <a href="scanner.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-indigo-400"><span
+                    class="text-xl">📷</span><span class="text-[10px] font-semibold">Scan</span></a>
+            <a href="attendance.html"
+                class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">📋</span><span class="text-[10px]">Attend.</span></a>
+            <a href="payments.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">💳</span><span class="text-[10px]">Payments</span></a>
+        </div>
+    </nav>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import {
-            getFirestore, collection, addDoc, getDocs,
-            query, where, serverTimestamp, doc, getDoc
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc }
+            from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { firebaseConfig } from "../js/firebase-config.js";
-        import { showToast, initials, formatTime } from "../js/app.js";
+        import { showToast, todayStr, formatTime, initials } from "../js/app.js";
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getFirestore(initializeApp(firebaseConfig));
+        const today = todayStr();
+        let scanning = false, busy = false, scanner = null;
 
-        // ── Today ────────────────────────────────────────────────────
-        const today = new Date();
-        const todayKey = today.toISOString().slice(0, 10);
         document.getElementById('scanDate').textContent =
-            today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-        // ── Scanner state ────────────────────────────────────────────
-        let html5QrcodeScanner = null;
-        let scanning = false;
-        let processingQr = false; // debounce multiple scans
-
-        // ── Start scanner ────────────────────────────────────────────
-        window.startScanner = function () {
-            if (scanning) return;
-            scanning = true;
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('stopBtn').style.display = '';
-
-            html5QrcodeScanner = new Html5Qrcode("reader");
-            html5QrcodeScanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                onScanSuccess,
-                (err) => { /* ignore frequent decode errors */ }
-            ).catch(err => {
-                showToast('Cannot access camera: ' + err, 'error');
-                scanning = false;
-                document.getElementById('startBtn').style.display = '';
-                document.getElementById('stopBtn').style.display = 'none';
+        window.startScan = function () {
+            if (scanning) return; scanning = true;
+            document.getElementById('startBtn').classList.add('hidden');
+            document.getElementById('stopBtn').classList.remove('hidden');
+            scanner = new Html5Qrcode('reader');
+            scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 240, height: 240 } },
+                async (txt) => { if (busy) return; busy = true; await mark(txt.trim()); setTimeout(() => busy = false, 3000); },
+                () => { }
+            ).catch(e => {
+                showToast('Camera error: ' + e, 'error'); scanning = false;
+                document.getElementById('startBtn').classList.remove('hidden');
+                document.getElementById('stopBtn').classList.add('hidden');
             });
         };
 
-        // ── Stop scanner ─────────────────────────────────────────────
-        window.stopScanner = function () {
-            if (!scanning) return;
-            html5QrcodeScanner?.stop().then(() => {
-                html5QrcodeScanner.clear();
-                scanning = false;
-                document.getElementById('startBtn').style.display = '';
-                document.getElementById('stopBtn').style.display = 'none';
-            }).catch(console.error);
+        window.stopScan = function () {
+            scanner?.stop().then(() => {
+                scanner.clear(); scanning = false;
+                document.getElementById('startBtn').classList.remove('hidden');
+                document.getElementById('stopBtn').classList.add('hidden');
+            });
         };
 
-        // ── On scan ──────────────────────────────────────────────────
-        async function onScanSuccess(decodedText) {
-            if (processingQr) return;
-            processingQr = true;
-
-            // Brief vibration on mobile
-            navigator?.vibrate?.(200);
-
-            await markAttendance(decodedText.trim());
-
-            // Debounce: allow next scan after 3 seconds
-            setTimeout(() => { processingQr = false; }, 3000);
-        }
-
-        // ── Core attendance marking function ────────────────────────
-        async function markAttendance(studentId) {
-            const container = document.getElementById('scanResultContainer');
-            container.style.display = 'block';
-            container.innerHTML = `<div class="scan-result-card">
-    <div class="loading-spinner"></div>
-    <span>Processing…</span>
-  </div>`;
-
-            try {
-                // Get student
-                const studentDoc = await getDoc(doc(db, 'students', studentId));
-                if (!studentDoc.exists()) {
-                    container.innerHTML = `<div class="scan-result-card error">
-        <span style="font-size:24px">❌</span>
-        <div>
-          <div style="font-weight:600;color:var(--danger)">Unknown Student</div>
-          <div style="font-size:12px;color:var(--text-muted)">ID: ${studentId.slice(0, 12)}…</div>
-        </div>
-      </div>`;
-                    showToast('Student not found in database.', 'error');
-                    return;
-                }
-
-                const student = { id: studentDoc.id, ...studentDoc.data() };
-
-                // Check if already scanned today (only first record counts)
-                const existingSnap = await getDocs(query(
-                    collection(db, 'attendance'),
-                    where('studentId', '==', studentId),
-                    where('date', '==', todayKey)
-                ));
-
-                if (!existingSnap.empty) {
-                    // Already marked — show duplicate warning
-                    const firstRecord = existingSnap.docs[0].data();
-                    const scanTime = formatTime(firstRecord.scannedAt?.toDate?.() || firstRecord.scannedAt);
-                    container.innerHTML = `<div class="scan-result-card duplicate">
-        <span style="font-size:36px">⚠️</span>
-        <div>
-          <div style="font-weight:700;font-size:15px;color:var(--warning)">Already Marked Present</div>
-          <div style="font-size:13px;color:var(--text-primary);margin-top:2px">
-            ${student.firstName} ${student.lastName}
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">
-            First scan was recorded at ${scanTime}
-          </div>
-        </div>
-      </div>`;
-                    showToast(`${student.firstName} already marked — first scan at ${scanTime}`, 'warning');
-                    await refreshLog();
-                    return;
-                }
-
-                // Record new attendance
-                await addDoc(collection(db, 'attendance'), {
-                    studentId,
-                    studentName: `${student.firstName} ${student.lastName}`,
-                    date: todayKey,
-                    scannedAt: serverTimestamp(),
-                    subject: student.subject || '',
-                    grade: student.grade || ''
-                });
-
-                const ini = initials(student.firstName, student.lastName);
-                container.innerHTML = `<div class="scan-result-card">
-      <div class="student-avatar" style="width:48px;height:48px;font-size:18px">${ini}</div>
-      <div>
-        <div style="font-weight:700;font-size:16px;color:var(--success)">✅ Attendance Recorded!</div>
-        <div style="font-size:14px;color:var(--text-primary);margin-top:2px">
-          ${student.firstName} ${student.lastName}
-        </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:4px">
-          Grade ${student.grade} • ${student.subject}
-        </div>
-      </div>
-    </div>`;
-
-                showToast(`✅ ${student.firstName} ${student.lastName} – Attendance recorded!`, 'success');
-                await refreshLog();
-
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = `<div class="scan-result-card error">
-      <span style="font-size:24px">❌</span>
-      <div>
-        <div style="font-weight:600;color:var(--danger)">Error</div>
-        <div style="font-size:12px;color:var(--text-muted)">${err.message}</div>
-      </div>
-    </div>`;
-                showToast('Error recording attendance.', 'error');
-            }
-        }
-
-        // ── Manual entry ─────────────────────────────────────────────
-        window.manualMark = async function () {
-            const id = document.getElementById('manualId').value.trim();
-            if (!id) { showToast('Please enter a student ID.', 'warning'); return; }
+        window.markManual = async function () {
+            const v = document.getElementById('manualId').value.trim();
+            if (!v) { showToast('Enter a student ID', 'warning'); return; }
             document.getElementById('manualId').value = '';
-            await markAttendance(id);
+            await mark(v);
         };
 
-        // ── Refresh today's log ───────────────────────────────────────
-        window.refreshLog = async function () {
-            const logEl = document.getElementById('todayLog');
+        async function mark(studentId) {
+            const rb = document.getElementById('resultBox');
+            rb.className = '';
+            rb.innerHTML = `<div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 flex items-center gap-3 text-gray-400 text-sm">
+    <svg class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z"/></svg>
+    Processing…</div>`;
+            rb.classList.remove('hidden');
+
             try {
-                const snap = await getDocs(query(
-                    collection(db, 'attendance'),
-                    where('date', '==', todayKey)
-                ));
+                const sdoc = await getDoc(doc(db, 'students', studentId));
+                if (!sdoc.exists()) {
+                    rb.innerHTML = `<div class="bg-red-500/5 border border-red-500/30 rounded-2xl p-4 flex items-center gap-3">
+        <div class="text-2xl">❌</div><div><div class="font-semibold text-red-400 text-sm">Unknown Student</div>
+        <div class="text-xs text-gray-500 mt-0.5">ID not found in database</div></div></div>`;
+                    showToast('Student not found', 'error'); return;
+                }
+                const s = { id: sdoc.id, ...sdoc.data() };
 
-                const records = [];
-                snap.forEach(d => records.push({ id: d.id, ...d.data() }));
-                records.sort((a, b) => (b.scannedAt?.seconds || 0) - (a.scannedAt?.seconds || 0));
-
-                document.getElementById('scanCount').textContent = `${records.length} Scanned Today`;
-                document.getElementById('logSubtitle').textContent = `${records.length} student${records.length !== 1 ? 's' : ''} present`;
-
-                if (records.length === 0) {
-                    logEl.innerHTML = `<div class="empty-state">
-        <div class="empty-icon">📷</div>
-        <h3>No Scans Yet</h3>
-        <p>Start the camera and scan student QR codes.</p>
-      </div>`;
-                    return;
+                // Check already scanned today
+                const ex = await getDocs(query(collection(db, 'attendance'), where('studentId', '==', studentId), where('date', '==', today)));
+                if (!ex.empty) {
+                    const first = ex.docs[0].data();
+                    const t = formatTime(first.scannedAt?.toDate?.() || first.scannedAt);
+                    rb.innerHTML = `<div class="bg-amber-500/5 border border-amber-500/30 rounded-2xl p-4 flex items-center gap-3">
+        <div class="text-3xl">⚠️</div>
+        <div><div class="font-bold text-amber-400">Already Marked Present</div>
+        <div class="text-sm text-white mt-0.5">${s.firstName} ${s.lastName}</div>
+        <div class="text-xs text-gray-500 mt-0.5">First scan at ${t} — duplicate not recorded</div></div></div>`;
+                    showToast(`${s.firstName} already scanned at ${t}`, 'warning'); await refreshLog(); return;
                 }
 
-                logEl.innerHTML = records.map((r, i) => {
+                await addDoc(collection(db, 'attendance'), {
+                    studentId, studentName: `${s.firstName} ${s.lastName}`,
+                    date: today, scannedAt: serverTimestamp(), grade: s.grade || '', subjects: s.subjects || []
+                });
+                navigator?.vibrate?.(200);
+                const ini = initials(s.firstName, s.lastName);
+                rb.innerHTML = `<div class="bg-emerald-500/5 border border-emerald-500/30 rounded-2xl p-4 flex items-center gap-3">
+      <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-lg font-bold text-white shrink-0">${ini}</div>
+      <div><div class="font-bold text-emerald-400">✅ Attendance Recorded!</div>
+      <div class="text-sm text-white mt-0.5">${s.firstName} ${s.lastName}</div>
+      <div class="text-xs text-gray-500 mt-0.5">Grade ${s.grade} • ${(s.subjects || [s.subject || ''])[0]}</div></div></div>`;
+                showToast(`✅ ${s.firstName} ${s.lastName} – attendance recorded!`, 'success');
+                await refreshLog();
+            } catch (e) { console.error(e); rb.innerHTML = `<div class="bg-red-500/5 border border-red-500/30 rounded-2xl p-4 text-red-400 text-sm">Error: ${e.message}</div>`; }
+        }
+
+        window.refreshLog = async function () {
+            const logEl = document.getElementById('logList');
+            try {
+                const snap = await getDocs(query(collection(db, 'attendance'), where('date', '==', today)));
+                const recs = []; snap.forEach(d => recs.push({ id: d.id, ...d.data() }));
+                recs.sort((a, b) => (b.scannedAt?.seconds || 0) - (a.scannedAt?.seconds || 0));
+                const cnt = recs.length;
+                document.getElementById('scanCount').textContent = `${cnt} Scanned Today`;
+                document.getElementById('scanCount2').textContent = `${cnt} Today`;
+                document.getElementById('logSub').textContent = `${cnt} student${cnt !== 1 ? 's' : ''} present`;
+                if (!cnt) {
+                    logEl.innerHTML = `<div class="text-center py-10 text-gray-600 text-sm">No scans yet today.<br>Start the camera to begin scanning.</div>`; return;
+                }
+                logEl.innerHTML = recs.map((r, i) => {
                     const ini = (r.studentName || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-                    const time = formatTime(r.scannedAt?.toDate?.() || r.scannedAt);
-                    return `<div class="attendance-item">
-        <div style="font-size:12px;color:var(--text-muted);width:24px;text-align:center">${i + 1}</div>
-        <div class="student-avatar">${ini}</div>
-        <div style="flex:1">
-          <div class="student-name">${r.studentName || 'Unknown'}</div>
-          <div class="student-id">Grade ${r.grade} • ${r.subject}</div>
-        </div>
-        <div class="attendance-time">${time}</div>
+                    const t = formatTime(r.scannedAt?.toDate?.() || r.scannedAt);
+                    return `<div class="flex items-center gap-3 px-4 py-3 hover:bg-gray-800/50 transition-colors">
+        <span class="text-xs text-gray-600 w-5 text-right shrink-0">${i + 1}</span>
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white shrink-0">${ini}</div>
+        <div class="flex-1 min-w-0"><div class="font-medium text-white text-sm truncate">${r.studentName || 'Unknown'}</div>
+        <div class="text-xs text-gray-500">Grade ${r.grade || '?'}</div></div>
+        <div class="text-xs text-gray-500 shrink-0">${t}</div>
       </div>`;
                 }).join('');
-
-            } catch (err) {
-                logEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>
-      <h3>Cannot load log</h3><p>Check Firebase config.</p></div>`;
-            }
+            } catch (e) { logEl.innerHTML = `<div class="text-center py-8 text-red-400 text-sm">Error: ${e.message}</div>`; }
         };
-
-        // ── Init ─────────────────────────────────────────────────────
-        const mobileBtn = document.getElementById('mobileMenuBtn');
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        mobileBtn?.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('open'); });
-        overlay?.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('open'); });
 
         refreshLog();
     </script>

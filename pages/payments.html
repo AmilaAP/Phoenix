@@ -3,511 +3,445 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payments – Phonex Institute</title>
-    <meta name="description" content="Track monthly class fee payments for Phonex Institute students.">
-    <link rel="stylesheet" href="../css/style.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Payments – Phoenix Institute</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
+<body class="bg-gray-950 text-gray-100 antialiased font-sans">
+    <div class="lg:flex lg:h-screen">
 
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <div class="app-layout">
+        <div id="overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="closeSidebar()"></div>
 
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <div class="logo-icon">🎓</div>
-                <div class="logo-text">
-                    <h2>Phonex</h2>
-                    <p>Institute System</p>
+        <aside id="sidebar"
+            class="fixed lg:sticky top-0 left-0 h-screen w-64 bg-gray-900 border-r border-gray-800 flex flex-col z-50 -translate-x-full lg:translate-x-0 transition-transform duration-300 shrink-0">
+            <div class="p-5 border-b border-gray-800 flex items-center gap-3">
+                <div
+                    class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg text-lg">
+                    🎓</div>
+                <div>
+                    <div class="font-bold text-white text-sm">Phoenix Institute</div>
+                    <div class="text-[11px] text-gray-500">Management System</div>
                 </div>
             </div>
-            <nav class="sidebar-nav">
-                <div class="nav-section-title">Main</div>
-                <a href="../index.html" class="nav-link">
-                    <div class="nav-icon">📊</div> Dashboard
-                </a>
-                <a href="students.html" class="nav-link">
-                    <div class="nav-icon">👨‍🎓</div> Students
-                </a>
-                <a href="attendance.html" class="nav-link">
-                    <div class="nav-icon">📋</div> Attendance
-                </a>
-                <a href="payments.html" class="nav-link active">
-                    <div class="nav-icon">💳</div> Payments
-                </a>
-                <div class="nav-section-title" style="margin-top:8px">Scanner</div>
-                <a href="scanner.html" class="nav-link">
-                    <div class="nav-icon">📷</div> QR Scanner
-                </a>
-                <a href="qr-codes.html" class="nav-link">
-                    <div class="nav-icon">🔲</div> QR Codes
-                </a>
+            <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
+                <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-3 pb-2">Main</p>
+                <a href="../index.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">📊</span>Dashboard</a>
+                <a href="students.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">👨‍🎓</span>Students</a>
+                <a href="attendance.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">📋</span>Attendance</a>
+                <a href="payments.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold"><span
+                        class="text-lg w-7 text-center">💳</span>Payments</a>
+                <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-4 pb-2">Scanner</p>
+                <a href="scanner.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">📷</span>QR Scanner</a>
+                <a href="qr-codes.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">🔲</span>QR Codes</a>
             </nav>
-            <div class="sidebar-footer">
-                <div class="sidebar-user">
-                    <div class="user-avatar">A</div>
+            <div class="p-4 border-t border-gray-800">
+                <div class="flex items-center gap-3 px-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold shrink-0">
+                        A</div>
                     <div>
-                        <div style="font-size:13px;font-weight:600">Admin</div>
-                        <div style="font-size:11px;color:var(--text-muted)">Institute Manager</div>
+                        <div class="text-xs font-semibold text-white">Admin</div>
+                        <div class="text-[10px] text-gray-500">Institute Manager</div>
                     </div>
                 </div>
             </div>
         </aside>
 
         <!-- Main -->
-        <div class="main-content">
-            <div class="topbar">
-                <div style="display:flex;align-items:center;gap:12px">
-                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-                    <div class="topbar-left">
-                        <h1>Payments</h1>
-                        <p>Monthly class fee tracking</p>
-                    </div>
-                </div>
-                <div class="topbar-right">
-                    <select class="form-control" id="monthSelector" style="width:auto;min-width:160px"></select>
-                </div>
-            </div>
+        <div class="flex-1 flex flex-col min-h-screen lg:overflow-y-auto">
 
-            <div class="page-content">
+            <!-- Mobile header -->
+            <header
+                class="lg:hidden sticky top-0 z-30 bg-gray-900/95 backdrop-blur border-b border-gray-800 px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()"
+                        class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-800 text-gray-300">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 5h12M3 9h12M3 13h12" />
+                        </svg>
+                    </button>
+                    <span class="font-bold text-white">Payments</span>
+                </div>
+                <select id="monthSel2" onchange="syncMonth(this)"
+                    class="bg-gray-800 border border-gray-700 rounded-xl px-2 py-1.5 text-xs text-gray-300 focus:outline-none"></select>
+            </header>
+
+            <!-- Desktop header -->
+            <header
+                class="hidden lg:flex sticky top-0 z-30 bg-gray-900/80 backdrop-blur border-b border-gray-800 px-8 py-4 items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-bold text-white">Payments</h1>
+                    <p class="text-sm text-gray-500">Monthly class fee tracking – per subject</p>
+                </div>
+                <select id="monthSel" onchange="syncMonth(this)"
+                    class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-indigo-500 transition-colors"></select>
+            </header>
+
+            <div class="flex-1 p-4 lg:p-8 pb-24 lg:pb-8 space-y-5">
 
                 <!-- Stats -->
-                <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
-                    <div class="stat-card">
-                        <div class="stat-icon green">💚</div>
-                        <div class="stat-info">
-                            <h3 id="statPaid">–</h3>
-                            <p>Paid</p>
-                        </div>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+                        <div class="w-9 h-9 bg-emerald-500/10 rounded-xl flex items-center justify-center text-lg mb-2">
+                            💚</div>
+                        <div class="text-2xl font-bold text-white" id="sPaid">—</div>
+                        <div class="text-xs text-gray-500 mt-0.5">Paid Slots</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon red">❤️</div>
-                        <div class="stat-info">
-                            <h3 id="statUnpaid">–</h3>
-                            <p>Unpaid</p>
+                    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+                        <div class="w-9 h-9 bg-red-500/10 rounded-xl flex items-center justify-center text-lg mb-2">❤️
                         </div>
+                        <div class="text-2xl font-bold text-white" id="sUnpaid">—</div>
+                        <div class="text-xs text-gray-500 mt-0.5">Unpaid Slots</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon yellow">💰</div>
-                        <div class="stat-info">
-                            <h3 id="statAmount">–</h3>
-                            <p>Collected (Rs.)</p>
+                    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+                        <div class="w-9 h-9 bg-amber-500/10 rounded-xl flex items-center justify-center text-lg mb-2">💰
                         </div>
+                        <div class="text-2xl font-bold text-white" id="sAmt">—</div>
+                        <div class="text-xs text-gray-500 mt-0.5">Collected (Rs.)</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon purple">📊</div>
-                        <div class="stat-info">
-                            <h3 id="statRateP">–%</h3>
-                            <p>Collection Rate</p>
-                        </div>
+                    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+                        <div class="w-9 h-9 bg-indigo-500/10 rounded-xl flex items-center justify-center text-lg mb-2">
+                            📊</div>
+                        <div class="text-2xl font-bold text-white" id="sRate">—%</div>
+                        <div class="text-xs text-gray-500 mt-0.5">Collection Rate</div>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-400 font-medium">Collection Progress</span>
+                        <span class="text-white font-semibold" id="progressLbl">—</span>
+                    </div>
+                    <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div id="progressFill"
+                            class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-700"
+                            style="width:0%"></div>
                     </div>
                 </div>
 
                 <!-- Filters -->
-                <div class="filters-bar" style="margin-bottom:16px">
-                    <div class="search-input-wrapper" style="max-width:260px">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search student…">
+                <div class="flex flex-wrap gap-2">
+                    <div class="relative flex-1 min-w-[160px]">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">🔍</span>
+                        <input id="q" type="text" placeholder="Search student…" oninput="applyFilter()"
+                            class="w-full bg-gray-900 border border-gray-700 rounded-xl pl-9 pr-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors">
                     </div>
-                    <select class="form-control" id="filterStatus" style="width:auto;min-width:130px">
-                        <option value="">All Students</option>
-                        <option value="paid">Paid Only</option>
-                        <option value="unpaid">Unpaid Only</option>
+                    <select id="fStatus" onchange="applyFilter()"
+                        class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none">
+                        <option value="">All</option>
+                        <option value="paid">Paid</option>
+                        <option value="unpaid">Unpaid</option>
                     </select>
-                    <select class="form-control" id="filterSubject" style="width:auto;min-width:130px">
+                    <select id="fSub" onchange="applyFilter()"
+                        class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none">
                         <option value="">All Subjects</option>
-                        <option value="Science">Science</option>
-                        <option value="Maths">Maths</option>
-                        <option value="Both">Both</option>
+                        <option>Science</option>
+                        <option>Maths</option>
                     </select>
-                    <select class="form-control" id="filterGrade" style="width:auto;min-width:120px">
+                    <select id="fGrade" onchange="applyFilter()"
+                        class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none">
                         <option value="">All Grades</option>
-                        <option value="6">Grade 6</option>
-                        <option value="7">Grade 7</option>
-                        <option value="8">Grade 8</option>
-                        <option value="9">Grade 9</option>
-                        <option value="10">Grade 10</option>
-                        <option value="11">Grade 11</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                        <option>11</option>
                     </select>
-                </div>
-
-                <!-- Progress -->
-                <div class="card" style="margin-bottom:20px">
-                    <div class="card-body" style="padding:16px 24px">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                            <span style="font-size:13px;color:var(--text-secondary)">Collection Progress</span>
-                            <span style="font-size:13px;font-weight:600;color:var(--text-primary)"
-                                id="progressLabel">—</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill" style="width:0%"></div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Table -->
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">💳 Payment Status</div>
-                            <div class="card-subtitle" id="paymentSubtitle">Loading...</div>
-                        </div>
-                        <div style="display:flex;gap:8px">
-                            <button class="btn btn-ghost btn-sm" onclick="markAllUnpaid()">Mark All Unpaid</button>
-                            <button class="btn btn-success btn-sm" onclick="markAllPaid()">Mark All Paid</button>
-                        </div>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table">
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Student</th>
-                                    <th>Grade</th>
-                                    <th>Subject</th>
-                                    <th>Parent Contact</th>
-                                    <th>Status</th>
-                                    <th>Amount (Rs.)</th>
-                                    <th>Date Paid</th>
-                                    <th>Action</th>
+                                <tr class="border-b border-gray-800 bg-gray-800/50">
+                                    <th
+                                        class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Student</th>
+                                    <th
+                                        class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                                        Grade</th>
+                                    <th
+                                        class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Subject</th>
+                                    <th
+                                        class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Status</th>
+                                    <th
+                                        class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                                        Amount</th>
+                                    <th
+                                        class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                                        Date Paid</th>
+                                    <th
+                                        class="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="payTableBody">
+                            <tbody id="ptbody">
                                 <tr>
-                                    <td colspan="9">
-                                        <div class="page-loading">
-                                            <div class="loading-spinner"></div>
-                                        </div>
+                                    <td colspan="7" class="text-center py-12 text-gray-600">
+                                        <svg class="animate-spin w-5 h-5 mx-auto mb-2" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                stroke-width="4" />
+                                            <path class="opacity-75" fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z" />
+                                        </svg>
+                                        Loading…
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <!-- ── Payment Modal ── -->
-    <div class="modal-overlay" id="payModal">
-        <div class="modal" style="max-width:440px">
-            <div class="modal-header">
-                <span class="modal-title">💳 Record Payment</span>
-                <button class="modal-close" onclick="closePayModal()">✕</button>
+    <!-- Mobile Bottom Nav -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 backdrop-blur-sm z-40">
+        <div class="flex items-center justify-around px-1 py-1">
+            <a href="../index.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">📊</span><span class="text-[10px]">Home</span></a>
+            <a href="students.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">👨‍🎓</span><span class="text-[10px]">Students</span></a>
+            <a href="scanner.html" class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">📷</span><span class="text-[10px]">Scan</span></a>
+            <a href="attendance.html"
+                class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">📋</span><span class="text-[10px]">Attend.</span></a>
+            <a href="payments.html"
+                class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-indigo-400"><span
+                    class="text-xl">💳</span><span class="text-[10px] font-semibold">Payments</span></a>
+        </div>
+    </nav>
+
+    <!-- Pay Modal -->
+    <div id="payModal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div
+            class="modal-enter bg-gray-900 border border-gray-700 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm shadow-2xl">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+                <h2 class="font-bold text-white text-base">💳 Record Payment</h2>
+                <button onclick="closeModal('payModal')"
+                    class="w-8 h-8 flex items-center justify-center rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-400 text-lg">✕</button>
             </div>
-            <div class="modal-body">
-                <input type="hidden" id="payStudentId">
-                <input type="hidden" id="payMonth">
-                <div
-                    style="background:var(--accent-glow);border:1px solid var(--border-active);border-radius:var(--radius-md);padding:14px;margin-bottom:20px">
-                    <div style="font-weight:700;color:var(--text-primary)" id="payStudentName">—</div>
-                    <div style="font-size:12px;color:var(--text-muted)" id="payStudentInfo">—</div>
+            <div class="p-6 space-y-4">
+                <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3">
+                    <div class="font-semibold text-white text-sm" id="pmName">—</div>
+                    <div class="text-xs text-gray-400 mt-0.5" id="pmInfo">—</div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Amount Paid (Rs.) *</label>
-                    <input type="number" class="form-control" id="payAmount" placeholder="2500" min="0">
+                <input type="hidden" id="pmId"><input type="hidden" id="pmSub"><input type="hidden" id="pmMonth">
+                <div><label class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Amount
+                        (Rs.) *</label>
+                    <input id="pmAmt" type="number" min="0" placeholder="2500"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Payment Date</label>
-                    <input type="date" class="form-control" id="payDate">
+                <div><label class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Date
+                        Paid</label>
+                    <input id="pmDate" type="date"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Notes (optional)</label>
-                    <input type="text" class="form-control" id="payNotes" placeholder="Cash / Bank transfer…">
+                <div><label
+                        class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Notes</label>
+                    <input id="pmNotes" placeholder="Cash / Bank transfer…"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors">
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="closePayModal()">Cancel</button>
-                <button class="btn btn-success" onclick="savePay()">✅ Confirm Payment</button>
+            <div class="flex gap-3 px-6 py-4 border-t border-gray-800">
+                <button onclick="closeModal('payModal')"
+                    class="flex-1 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium transition-colors">Cancel</button>
+                <button onclick="savePay()"
+                    class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors">✅
+                    Confirm</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import {
-            getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc,
-            doc, query, where, orderBy, serverTimestamp
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, updateDoc, doc, getDocs, query, where, serverTimestamp }
+            from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { firebaseConfig } from "../js/firebase-config.js";
-        import { showToast, confirmAction, initials } from "../js/app.js";
+        import { showToast, confirmAction, initials, getSubjects, openModal, closeModal, currentMonthStr } from "../js/app.js";
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getFirestore(initializeApp(firebaseConfig));
+        let students = [], payMap = {}, selMonth = '';
+        // payMap key = `${studentId}_${subject}`
 
-        let allStudents = [];
-        let paymentMap = {};   // studentId -> payment record
-        let selectedMonth = '';
-
-        // ── Build month selector ──────────────────────────────────────
-        function populateMonthSelector() {
-            const sel = document.getElementById('monthSelector');
-            const now = new Date();
+        // ── Month selector ───────────────────────────────────────────
+        function buildMonthSel() {
+            const now = new Date(); const opts = [];
             for (let i = 0; i < 12; i++) {
                 const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
                 const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                const label = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                const opt = document.createElement('option');
-                opt.value = val; opt.textContent = label;
-                sel.appendChild(opt);
+                const lbl = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                opts.push(`<option value="${val}">${lbl}</option>`);
             }
-            selectedMonth = sel.value;
+            ['monthSel', 'monthSel2'].forEach(id => { const e = document.getElementById(id); if (e) e.innerHTML = opts.join(''); });
+            selMonth = document.getElementById('monthSel')?.value || currentMonthStr();
         }
 
-        // ── Load ─────────────────────────────────────────────────────
+        window.syncMonth = function (el) {
+            selMonth = el.value;
+            ['monthSel', 'monthSel2'].forEach(id => { const e = document.getElementById(id); if (e) e.value = selMonth; });
+            loadAll();
+        };
+
         async function loadAll() {
-            try {
-                const [studSnap, paySnap] = await Promise.all([
-                    getDocs(query(collection(db, 'students'), orderBy('createdAt', 'desc'))),
-                    getDocs(query(collection(db, 'payments'), where('month', '==', selectedMonth)))
-                ]);
-
-                allStudents = [];
-                studSnap.forEach(d => allStudents.push({ id: d.id, ...d.data() }));
-
-                paymentMap = {};
-                paySnap.forEach(d => { paymentMap[d.data().studentId] = { id: d.id, ...d.data() }; });
-
-                applyFilters();
-            } catch (err) {
-                console.error(err);
-                document.getElementById('payTableBody').innerHTML =
-                    `<tr><td colspan="9"><div class="empty-state">
-        <div class="empty-icon">⚠️</div><h3>Firebase not configured</h3>
-        <p>Fill in your credentials in <code>js/firebase-config.js</code></p>
-      </div></td></tr>`;
-            }
+            const [ss, ps] = await Promise.all([
+                getDocs(collection(db, 'students')),
+                getDocs(query(collection(db, 'payments'), where('month', '==', selMonth)))
+            ]);
+            students = []; ss.forEach(d => students.push({ id: d.id, ...d.data() }));
+            students.sort((a, b) => (a.firstName || '').localeCompare(b.firstName || ''));
+            payMap = {}; ps.forEach(d => { const x = d.data(); payMap[`${x.studentId}_${x.subject}`] = { id: d.id, ...x }; });
+            applyFilter();
         }
 
-        // ── Render ───────────────────────────────────────────────────
-        function renderTable(students) {
-            const tbody = document.getElementById('payTableBody');
+        // ── Build slots ───────────────────────────────────────────────
+        function buildSlots() {
+            const slots = [];
+            students.forEach(s => {
+                getSubjects(s).forEach(sub => {
+                    slots.push({ student: s, subject: sub, pay: payMap[`${s.id}_${sub}`] });
+                });
+            });
+            return slots;
+        }
 
-            const paid = students.filter(s => paymentMap[s.id]?.paid);
-            const unpaid = students.filter(s => !paymentMap[s.id]?.paid);
-            const total = students.length;
-            const rate = total > 0 ? Math.round((paid.length / total) * 100) : 0;
-            const totalAmt = Object.values(paymentMap).reduce((sum, p) => sum + (p.paid ? (Number(p.amount) || 0) : 0), 0);
+        window.applyFilter = function () {
+            const q = document.getElementById('q').value.toLowerCase();
+            const fs = document.getElementById('fStatus').value;
+            const fsub = document.getElementById('fSub').value;
+            const fg = document.getElementById('fGrade').value;
+            const slots = buildSlots().filter(({ student: s, subject, pay }) => {
+                const paid = !!pay?.paid;
+                return (!q || `${s.firstName} ${s.lastName}`.toLowerCase().includes(q))
+                    && (!fs || (fs === 'paid' ? paid : !paid))
+                    && (!fsub || subject === fsub)
+                    && (!fg || String(s.grade) === fg);
+            });
+            renderTable(slots);
+        };
 
-            document.getElementById('statPaid').textContent = paid.length;
-            document.getElementById('statUnpaid').textContent = unpaid.length;
-            document.getElementById('statAmount').textContent = totalAmt.toLocaleString();
-            document.getElementById('statRateP').textContent = `${rate}%`;
-            document.getElementById('progressLabel').textContent = `${paid.length} / ${total} paid (${rate}%)`;
-            document.getElementById('progressFill').style.width = `${rate}%`;
+        function renderTable(slots) {
+            const totalAll = buildSlots();
+            const paidCount = totalAll.filter(x => x.pay?.paid).length;
+            const total = totalAll.length;
+            const rate = total ? Math.round(paidCount / total * 100) : 0;
+            const amt = Object.values(payMap).reduce((s, p) => s + (p.paid ? Number(p.amount || 0) : 0), 0);
+            document.getElementById('sPaid').textContent = paidCount;
+            document.getElementById('sUnpaid').textContent = Math.max(0, total - paidCount);
+            document.getElementById('sAmt').textContent = amt.toLocaleString();
+            document.getElementById('sRate').textContent = rate + '%';
+            document.getElementById('progressLbl').textContent = `${paidCount}/${total} paid`;
+            document.getElementById('progressFill').style.width = rate + '%';
 
-            document.getElementById('paymentSubtitle').textContent =
-                `${paid.length} of ${total} students paid for ${selectedMonth}`;
-
-            if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state">
-      <div class="empty-icon">💳</div><h3>No Students Found</h3>
-    </div></td></tr>`;
-                return;
+            const tb = document.getElementById('ptbody');
+            if (!slots.length) {
+                tb.innerHTML = `<tr><td colspan="7" class="text-center py-16 text-gray-600"><div class="text-4xl mb-3 opacity-30">💳</div><div>No records found</div></td></tr>`; return;
             }
 
-            tbody.innerHTML = [...paid, ...unpaid].map((s, i) => {
-                const pay = paymentMap[s.id];
-                const isPaid = pay?.paid;
-                const ini = initials(s.firstName, s.lastName);
-                const subjectClass = s.subject?.toLowerCase() === 'maths' ? 'maths' : 'science';
-                const datePaid = isPaid && pay.paidDate
-                    ? new Date(pay.paidDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-                    : '—';
+            // Sort: unpaid first
+            slots.sort((a, b) => (a.pay?.paid ? 1 : 0) - (b.pay?.paid ? 1 : 0));
 
-                return `<tr>
-      <td style="color:var(--text-muted)">${i + 1}</td>
-      <td>
-        <div class="name-cell">
-          <div class="student-avatar" style="${isPaid ? '' : 'opacity:0.6;filter:grayscale(1)'}">${ini}</div>
-          <div>
-            <div class="student-name">${s.firstName} ${s.lastName}</div>
-            <div class="student-id">${s.school || ''}</div>
-          </div>
+            tb.innerHTML = slots.map(({ student: s, subject, pay }) => {
+                const paid = !!pay?.paid;
+                const ini = initials(s.firstName, s.lastName);
+                const subBg = subject === 'Science' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+                const subIcon = subject === 'Science' ? '🔬' : '📐';
+                const datePaid = pay?.paidDate ? new Date(pay.paidDate + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : '—';
+                return `<tr class="border-b border-gray-800 hover:bg-gray-800/40 transition-colors">
+      <td class="px-4 py-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br ${paid ? 'from-indigo-500 to-violet-600' : 'from-gray-600 to-gray-700'} flex items-center justify-center text-xs font-bold text-white shrink-0">${ini}</div>
+          <div><div class="font-medium text-white text-sm">${s.firstName} ${s.lastName}</div>
+          <div class="text-xs text-gray-500">${s.parentContact || ''}</div></div>
         </div>
       </td>
-      <td><span class="grade-pill">Grade ${s.grade}</span></td>
-      <td><span class="subject-pill ${subjectClass}">${s.subject}</span></td>
-      <td style="color:var(--text-muted)">${s.parentContact || '—'}</td>
-      <td>${isPaid
-                        ? '<span class="badge badge-success">✅ Paid</span>'
-                        : '<span class="badge badge-danger">❌ Unpaid</span>'
-                    }</td>
-      <td style="color:var(--text-primary);font-weight:${isPaid ? '600' : '400'}">
-        ${isPaid ? `Rs. ${Number(pay.amount || 0).toLocaleString()}` : '—'}
+      <td class="px-4 py-3 hidden sm:table-cell">
+        <span class="inline-flex px-2 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-400 text-[11px] font-medium border border-indigo-500/20">Grade ${s.grade || '?'}</span>
       </td>
-      <td style="color:var(--text-muted)">${datePaid}</td>
-      <td>
-        ${isPaid
-                        ? `<button class="btn btn-danger btn-sm" onclick="unmarkPaid('${s.id}')">↩ Unpay</button>`
-                        : `<button class="btn btn-success btn-sm" onclick="openPayModal('${s.id}')">💳 Mark Paid</button>`
+      <td class="px-4 py-3">
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg ${subBg} text-[11px] font-medium border">${subIcon} ${subject}</span>
+      </td>
+      <td class="px-4 py-3">
+        ${paid
+                        ? '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">✅ Paid</span>'
+                        : '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-semibold border border-red-500/20">❌ Unpaid</span>'
+                    }
+      </td>
+      <td class="px-4 py-3 text-gray-300 font-medium text-sm hidden md:table-cell">${paid ? 'Rs. ' + Number(pay.amount || 0).toLocaleString() : '—'}</td>
+      <td class="px-4 py-3 text-gray-500 text-sm hidden lg:table-cell">${datePaid}</td>
+      <td class="px-4 py-3 text-right">
+        ${paid
+                        ? `<button onclick="unmark('${s.id}','${subject}')" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-red-500/20 hover:text-red-400 text-gray-400 text-xs font-medium transition-colors">↩ Undo</button>`
+                        : `<button onclick="openPay('${s.id}','${subject}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shadow-sm">💳 Pay</button>`
                     }
       </td>
     </tr>`;
             }).join('');
         }
 
-        function applyFilters() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const status = document.getElementById('filterStatus').value;
-            const subject = document.getElementById('filterSubject').value;
-            const grade = document.getElementById('filterGrade').value;
-
-            const filtered = allStudents.filter(s => {
-                const isPaid = paymentMap[s.id]?.paid;
-                const matchSearch = !search || `${s.firstName} ${s.lastName}`.toLowerCase().includes(search);
-                const matchStatus = !status || (status === 'paid' ? isPaid : !isPaid);
-                const matchSubject = !subject || s.subject === subject || s.subject === 'Both';
-                const matchGrade = !grade || String(s.grade) === grade;
-                return matchSearch && matchStatus && matchSubject && matchGrade;
-            });
-            renderTable(filtered);
-        }
-
-        ['searchInput', 'filterStatus', 'filterSubject', 'filterGrade'].forEach(id =>
-            document.getElementById(id)?.addEventListener('input', applyFilters)
-        );
-
-        document.getElementById('monthSelector').addEventListener('change', (e) => {
-            selectedMonth = e.target.value;
-            loadAll();
-        });
-
-        // ── Pay modal ────────────────────────────────────────────────
-        window.openPayModal = function (studentId) {
-            const s = allStudents.find(x => x.id === studentId);
-            if (!s) return;
-            document.getElementById('payStudentId').value = studentId;
-            document.getElementById('payMonth').value = selectedMonth;
-            document.getElementById('payStudentName').textContent = `${s.firstName} ${s.lastName}`;
-            document.getElementById('payStudentInfo').textContent = `Grade ${s.grade} • ${s.subject} • ${selectedMonth}`;
-            document.getElementById('payAmount').value = '';
-            document.getElementById('payNotes').value = '';
-            document.getElementById('payDate').value = new Date().toISOString().slice(0, 10);
-            document.getElementById('payModal').classList.add('open');
-            document.body.style.overflow = 'hidden';
-        };
-
-        window.closePayModal = function () {
-            document.getElementById('payModal').classList.remove('open');
-            document.body.style.overflow = '';
+        // ── Pay modal ─────────────────────────────────────────────────
+        window.openPay = function (sid, sub) {
+            const s = students.find(x => x.id === sid); if (!s) return;
+            document.getElementById('pmId').value = sid;
+            document.getElementById('pmSub').value = sub;
+            document.getElementById('pmMonth').value = selMonth;
+            document.getElementById('pmName').textContent = `${s.firstName} ${s.lastName}`;
+            document.getElementById('pmInfo').textContent = `Grade ${s.grade} • ${sub === 'Science' ? '🔬' : '📐'} ${sub} • ${selMonth}`;
+            document.getElementById('pmAmt').value = '';
+            document.getElementById('pmNotes').value = '';
+            document.getElementById('pmDate').value = new Date().toISOString().slice(0, 10);
+            openModal('payModal');
         };
 
         window.savePay = async function () {
-            const studentId = document.getElementById('payStudentId').value;
-            const month = document.getElementById('payMonth').value;
-            const amount = document.getElementById('payAmount').value;
-            const paidDate = document.getElementById('payDate').value;
-            const notes = document.getElementById('payNotes').value.trim();
-
-            if (!amount) { showToast('Please enter the amount paid.', 'error'); return; }
-
+            const sid = document.getElementById('pmId').value;
+            const sub = document.getElementById('pmSub').value;
+            const month = document.getElementById('pmMonth').value;
+            const amt = document.getElementById('pmAmt').value;
+            const date = document.getElementById('pmDate').value;
+            const notes = document.getElementById('pmNotes').value.trim();
+            if (!amt) { showToast('Enter the amount paid', 'error'); return; }
+            const key = `${sid}_${sub}`;
+            const data = { studentId: sid, subject: sub, month, paid: true, amount: Number(amt), paidDate: date, notes, updatedAt: serverTimestamp() };
             try {
-                const existing = paymentMap[studentId];
-                const data = { studentId, month, paid: true, amount: Number(amount), paidDate, notes, updatedAt: serverTimestamp() };
-
-                if (existing) {
-                    await updateDoc(doc(db, 'payments', existing.id), data);
-                } else {
-                    data.createdAt = serverTimestamp();
-                    await addDoc(collection(db, 'payments'), data);
-                }
-
-                closePayModal();
-                showToast('Payment recorded successfully!', 'success');
+                if (payMap[key]) { await updateDoc(doc(db, 'payments', payMap[key].id), data); }
+                else { data.createdAt = serverTimestamp(); await addDoc(collection(db, 'payments'), data); }
+                showToast('Payment recorded ✅', 'success');
+                closeModal('payModal');
                 await loadAll();
-            } catch (err) {
-                console.error(err);
-                showToast('Error saving payment.', 'error');
-            }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
         };
 
-        // ── Unmark paid ───────────────────────────────────────────────
-        window.unmarkPaid = async function (studentId) {
-            const s = allStudents.find(x => x.id === studentId);
-            const ok = await confirmAction(`Mark <strong>${s?.firstName} ${s?.lastName}</strong>'s payment as UNPAID for ${selectedMonth}?`);
-            if (!ok) return;
-
+        window.unmark = async function (sid, sub) {
+            const key = `${sid}_${sub}`; const s = students.find(x => x.id === sid);
+            if (!await confirmAction(`Remove payment for <strong>${s?.firstName}'s ${sub}</strong> class?`)) return;
             try {
-                const pay = paymentMap[studentId];
-                if (pay) {
-                    await updateDoc(doc(db, 'payments', pay.id), { paid: false, amount: 0, paidDate: '', updatedAt: serverTimestamp() });
-                }
-                showToast('Payment removed.', 'info');
-                await loadAll();
-            } catch (err) {
-                console.error(err);
-                showToast('Error updating payment.', 'error');
-            }
+                if (payMap[key]) { await updateDoc(doc(db, 'payments', payMap[key].id), { paid: false, amount: 0, paidDate: '', updatedAt: serverTimestamp() }); }
+                showToast('Payment removed', 'info'); await loadAll();
+            } catch (e) { showToast('Error', 'error'); }
         };
 
-        // ── Mark all paid / unpaid ───────────────────────────────────
-        window.markAllPaid = async function () {
-            const visible = applyFiltersRaw();
-            const unpaid = visible.filter(s => !paymentMap[s.id]?.paid);
-            if (unpaid.length === 0) { showToast('All visible students are already paid.', 'info'); return; }
-
-            const ok = await confirmAction(`Mark all <strong>${unpaid.length}</strong> unpaid students as PAID with amount Rs. ?<br><small>You can edit individual amounts afterwards.</small>`);
-            if (!ok) return;
-
-            const amtStr = prompt('Enter default amount for all (Rs.):');
-            if (!amtStr) return;
-
-            try {
-                await Promise.all(unpaid.map(s => {
-                    const data = {
-                        studentId: s.id, month: selectedMonth, paid: true,
-                        amount: Number(amtStr), paidDate: new Date().toISOString().slice(0, 10),
-                        notes: 'Bulk marked', createdAt: serverTimestamp(), updatedAt: serverTimestamp()
-                    };
-                    return addDoc(collection(db, 'payments'), data);
-                }));
-                showToast(`Marked ${unpaid.length} students as paid.`, 'success');
-                await loadAll();
-            } catch (err) {
-                showToast('Error marking payments.', 'error');
-            }
-        };
-
-        window.markAllUnpaid = async function () {
-            const ok = await confirmAction('Remove ALL payments for this month? This cannot be undone.');
-            if (!ok) return;
-            try {
-                const snap = await getDocs(query(collection(db, 'payments'), where('month', '==', selectedMonth)));
-                await Promise.all(snap.docs.map(d => updateDoc(d.ref, { paid: false, amount: 0, paidDate: '', updatedAt: serverTimestamp() })));
-                showToast('All payments removed for this month.', 'info');
-                await loadAll();
-            } catch (err) {
-                showToast('Error.', 'error');
-            }
-        };
-
-        function applyFiltersRaw() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const status = document.getElementById('filterStatus').value;
-            const subject = document.getElementById('filterSubject').value;
-            const grade = document.getElementById('filterGrade').value;
-            return allStudents.filter(s => {
-                const isPaid = paymentMap[s.id]?.paid;
-                return (!search || `${s.firstName} ${s.lastName}`.toLowerCase().includes(search))
-                    && (!status || (status === 'paid' ? isPaid : !isPaid))
-                    && (!subject || s.subject === subject || s.subject === 'Both')
-                    && (!grade || String(s.grade) === grade);
-            });
-        }
-
-        // ── Init ─────────────────────────────────────────────────────
-        const mobileBtn = document.getElementById('mobileMenuBtn');
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        mobileBtn?.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('open'); });
-        overlay?.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('open'); });
-
-        populateMonthSelector();
+        buildMonthSel();
         loadAll();
     </script>
 </body>
