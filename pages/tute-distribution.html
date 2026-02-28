@@ -467,15 +467,27 @@
             const fs = document.getElementById('fSub').value;
             const fst = document.getElementById('fStatus').value;
 
+            // Get the current tute's own subject & grade as the base filter
+            const tute = allTutes.find(t => t.id === currentTuteId);
+            const tuteSubject = tute?.subject || '';   // e.g. "Science" or "" for all
+            const tuteGrade = tute?.grade || '';   // e.g. "8" or "" for all
+
             let list = allStudents.filter(s => {
                 const subs = s.subjects || [s.subject || ''].filter(Boolean);
+
+                // ── Tute-level hard filter (subject & grade from the tute itself) ──
+                const tuteSub = !tuteSubject || subs.includes(tuteSubject);
+                const tuteGradeMatch = !tuteGrade || String(s.grade) === tuteGrade;
+
+                // ── Additional manual filter dropdowns ──
                 const gradeMatch = !fg || String(s.grade) === fg;
                 const subMatch = !fs || subs.includes(fs);
                 const nameMatch = !q || `${s.firstName} ${s.lastName}`.toLowerCase().includes(q);
                 const rec = records[s.id];
                 const given = !!rec?.given;
                 const statusMatch = !fst || (fst === 'given' ? given : !given);
-                return gradeMatch && subMatch && nameMatch && statusMatch;
+
+                return tuteSub && tuteGradeMatch && gradeMatch && subMatch && nameMatch && statusMatch;
             });
 
             updateStats(list);
@@ -573,13 +585,18 @@
                     const avatar = row.querySelector('.rounded-full');
                     if (avatar) avatar.className = `w-8 h-8 rounded-full bg-gradient-to-br ${given ? 'from-emerald-500 to-teal-600' : 'from-gray-600 to-gray-700'} flex items-center justify-center text-xs font-bold text-white shrink-0`;
                 }
-                // Update stats
+                // Update stats — respect tute's own subject/grade boundary
                 const fg = document.getElementById('fGrade').value;
                 const fs = document.getElementById('fSub').value;
-                const fst = document.getElementById('fStatus').value;
+                const tute = allTutes.find(t => t.id === currentTuteId);
+                const tuteSubject = tute?.subject || '';
+                const tuteGrade = tute?.grade || '';
                 const filteredList = allStudents.filter(s => {
                     const subs = s.subjects || [s.subject || ''].filter(Boolean);
-                    return (!fg || String(s.grade) === fg) && (!fs || subs.includes(fs));
+                    return (!tuteSubject || subs.includes(tuteSubject))
+                        && (!tuteGrade || String(s.grade) === tuteGrade)
+                        && (!fg || String(s.grade) === fg)
+                        && (!fs || subs.includes(fs));
                 });
                 updateStats(filteredList);
             } catch (e) { showToast('Failed to save: ' + e.message, 'error'); checkbox.checked = !given; }
