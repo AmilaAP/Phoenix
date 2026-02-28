@@ -309,6 +309,23 @@
                         class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
                         placeholder="Additional notes…"></textarea>
                 </div>
+                <!-- Notify Parent Toggle -->
+                <div class="flex items-center justify-between bg-gray-800 border border-gray-700 rounded-xl px-4 py-3">
+                    <div>
+                        <div class="text-sm font-semibold text-white">📲 Notify Parent on Arrival</div>
+                        <div class="text-[11px] text-gray-500 mt-0.5">Send SMS to parent when student scans QR code
+                        </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-3">
+                        <input type="checkbox" id="chkNotify" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer
+                            peer-checked:after:translate-x-full peer-checked:after:border-white
+                            after:content-[''] after:absolute after:top-0.5 after:left-[2px]
+                            after:bg-white after:border-gray-300 after:border after:rounded-full
+                            after:h-5 after:w-5 after:transition-all
+                            peer-checked:bg-emerald-500"></div>
+                    </label>
+                </div>
             </div>
             <div
                 class="flex items-center gap-3 px-6 py-4 border-t border-gray-800 sticky bottom-0 bg-gray-900 rounded-b-2xl">
@@ -398,6 +415,7 @@
             document.getElementById('chkMath').checked = false;
             document.getElementById('chkTamil').checked = false;
             document.getElementById('chkEnglish').checked = false;
+            document.getElementById('chkNotify').checked = false;
             document.getElementById('modalTitle').textContent = 'Add Student';
             document.getElementById('saveTxt').textContent = 'Add Student';
         }
@@ -424,6 +442,7 @@
             document.getElementById('chkMath').checked = subs.includes('Maths');
             document.getElementById('chkTamil').checked = subs.includes('Tamil');
             document.getElementById('chkEnglish').checked = subs.includes('English');
+            document.getElementById('chkNotify').checked = !!s.notifyParent;
             document.getElementById('modalTitle').textContent = 'Edit Student';
             document.getElementById('saveTxt').textContent = 'Save Changes';
             openModal('modal');
@@ -450,7 +469,8 @@
                 grade, subjects, birthdate: document.getElementById('bd').value,
                 parentName: document.getElementById('pn').value.trim(),
                 parentContact: document.getElementById('pc').value.trim(),
-                notes: document.getElementById('notes').value.trim()
+                notes: document.getElementById('notes').value.trim(),
+                notifyParent: document.getElementById('chkNotify').checked
             };
             try {
                 if (editId) {

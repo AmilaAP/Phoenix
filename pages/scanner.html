@@ -205,6 +205,55 @@
         const today = todayStr();
         let scanning = false, busy = false, scanner = null;
 
+        // ── SMS Configuration ──────────────────────────────────────────
+        //  Provider: Textbelt  (https://textbelt.com)
+        //  Free key  = 'textbelt'  (1 SMS per day globally — enough for testing)
+        //  Paid key  = buy at textbelt.com and paste it below for unlimited SMS
+        const SMS_CFG = {
+            apiKey: 'textbelt',        // ← replace with your paid key when ready
+            apiUrl: 'https://textbelt.com/text',
+        };
+
+        // Format Sri Lankan numbers to E.164 (+94XXXXXXXXX)
+        function formatLKNumber(raw) {
+            const digits = raw.replace(/\D/g, '');          // strip non-digits
+            if (digits.startsWith('94')) return '+' + digits;
+            if (digits.startsWith('0') && digits.length === 10)
+                return '+94' + digits.slice(1);            // 07XXXXXXXX → +947XXXXXXXX
+            if (digits.length === 9)                        // already without leading 0
+                return '+94' + digits;
+            return null;                                    // can’t parse
+        }
+
+        async function sendSms(student) {
+            if (!student.notifyParent) return;              // toggle off
+            const raw = student.parentContact || '';
+            if (!raw) return;                               // no number stored
+            const phone = formatLKNumber(raw);
+            if (!phone) { console.warn('SMS: Cannot format number:', raw); return; }
+
+            const now = new Date().toLocaleTimeString('en-LK', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const msg = `Dear Parent, ${student.firstName} has arrived at Phoenix Education Institute at ${now}. Have a great day!`;
+
+            try {
+                const res = await fetch(SMS_CFG.apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ phone, message: msg, key: SMS_CFG.apiKey })
+                });
+                const json = await res.json();
+                if (json.success) {
+                    showToast(`📲 SMS sent to parent of ${student.firstName}`, 'success');
+                } else {
+                    console.warn('SMS failed:', json.error);
+                    showToast(`SMS not sent: ${json.error || 'Unknown error'}`, 'warning');
+                }
+            } catch (err) {
+                console.warn('SMS error:', err);
+                // Don’t block the UI — attendance is still recorded
+            }
+        }
+
         document.getElementById('scanDate').textContent =
             new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -279,8 +328,10 @@
       <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-lg font-bold text-white shrink-0">${ini}</div>
       <div><div class="font-bold text-emerald-400">✅ Attendance Recorded!</div>
       <div class="text-sm text-white mt-0.5">${s.firstName} ${s.lastName}</div>
-      <div class="text-xs text-gray-500 mt-0.5">Grade ${s.grade} • ${(s.subjects || [s.subject || ''])[0]}</div></div></div>`;
+      <div class="text-xs text-gray-500 mt-0.5">Grade ${s.grade} • ${(s.subjects || [s.subject || ''])[0]}${s.notifyParent && s.parentContact ? ' • 📲 Notifying parent…' : ''}</div></div></div>`;
                 showToast(`✅ ${s.firstName} ${s.lastName} – attendance recorded!`, 'success');
+                // Send SMS to parent if enabled (non-blocking)
+                sendSms(s);
                 await refreshLog();
             } catch (e) { console.error(e); rb.innerHTML = `<div class="bg-red-500/5 border border-red-500/30 rounded-2xl p-4 text-red-400 text-sm">Error: ${e.message}</div>`; }
         }
