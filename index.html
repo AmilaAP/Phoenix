@@ -10,8 +10,14 @@
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
   <!-- Auth + sidebar helpers — plain script (before modules) -->
   <script>
-    // Auth guard
-    (function () { if (!localStorage.getItem('phoenixAuth')) location.replace('login.html'); })();
+    // Auth guard — admin only
+    (function () {
+      try {
+        const s = JSON.parse(localStorage.getItem('phoenixSession') || 'null');
+        if (!s && !localStorage.getItem('phoenixAuth')) { location.replace('login.html'); return; }
+        if (s && s.role !== 'admin') { location.replace('pages/lms-portal.html'); return; }
+      } catch { location.replace('login.html'); }
+    })();
     function toggleSidebar() {
       document.getElementById('sidebar')?.classList.toggle('-translate-x-full');
       document.getElementById('overlay')?.classList.toggle('hidden');
@@ -20,12 +26,7 @@
       document.getElementById('sidebar')?.classList.add('-translate-x-full');
       document.getElementById('overlay')?.classList.add('hidden');
     }
-    function logout() {
-      localStorage.removeItem('phoenixAuth');
-      localStorage.removeItem('phoenixRole');
-      localStorage.removeItem('phoenixUser');
-      location.replace('login.html');
-    }
+    function logout() { localStorage.clear(); location.replace('login.html'); }
   </script>
 </head>
 
@@ -68,6 +69,26 @@
         <a href="pages/qr-codes.html"
           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
             class="text-lg w-7 text-center">🔲</span>QR Codes</a>
+        <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-4 pb-2">LMS</p>
+        <a href="pages/lms-portal.html"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+            class="text-lg w-7 text-center">🎓</span>LMS Portal</a>
+        <a href="pages/lms-lessons.html"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+            class="text-lg w-7 text-center">📚</span>Lessons</a>
+        <a href="pages/lms-results.html"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+            class="text-lg w-7 text-center">📝</span>Results</a>
+        <a href="pages/lms-documents.html"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+            class="text-lg w-7 text-center">📁</span>Documents</a>
+        <a href="pages/lms-notifications.html"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+            class="text-lg w-7 text-center">🔔</span>Notifications</a>
+        <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-4 pb-2">Admin</p>
+        <a href="pages/users.html"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+            class="text-lg w-7 text-center">👤</span>User Accounts</a>
       </nav>
       <div class="p-4 border-t border-gray-800">
         <div class="flex items-center gap-2 px-2">

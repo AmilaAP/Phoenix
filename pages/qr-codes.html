@@ -9,21 +9,16 @@
     <!-- No client-side QR library needed – images served via api.qrserver.com -->
     <!-- Auth + sidebar helpers — plain script so always available -->
     <script>
-        (function () { if (!localStorage.getItem('phoenixAuth')) location.replace('../login.html'); })();
-        function toggleSidebar() {
-            document.getElementById('sidebar')?.classList.toggle('-translate-x-full');
-            document.getElementById('overlay')?.classList.toggle('hidden');
-        }
-        function closeSidebar() {
-            document.getElementById('sidebar')?.classList.add('-translate-x-full');
-            document.getElementById('overlay')?.classList.add('hidden');
-        }
-        function logout() {
-            localStorage.removeItem('phoenixAuth');
-            localStorage.removeItem('phoenixRole');
-            localStorage.removeItem('phoenixUser');
-            location.replace('../login.html');
-        }
+        (function () {
+            try {
+                const s = JSON.parse(localStorage.getItem('phoenixSession') || 'null');
+                if (!s && !localStorage.getItem('phoenixAuth')) { location.replace('../login.html'); return; }
+                if (s && s.role !== 'admin') { location.replace('lms-portal.html'); return; }
+            } catch { location.replace('../login.html'); }
+        })();
+        function toggleSidebar() { document.getElementById('sidebar')?.classList.toggle('-translate-x-full'); document.getElementById('overlay')?.classList.toggle('hidden'); }
+        function closeSidebar() { document.getElementById('sidebar')?.classList.add('-translate-x-full'); document.getElementById('overlay')?.classList.add('hidden'); }
+        function logout() { localStorage.clear(); location.replace('../login.html'); }
     </script>
 </head>
 
@@ -62,6 +57,26 @@
                 <a href="qr-codes.html"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold"><span
                         class="w-7 text-center text-lg">🔲</span>QR Codes</a>
+                <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-4 pb-2">LMS</p>
+                <a href="lms-portal.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">🎓</span>LMS Portal</a>
+                <a href="lms-lessons.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">📚</span>Lessons</a>
+                <a href="lms-results.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">📝</span>Results</a>
+                <a href="lms-documents.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">📁</span>Documents</a>
+                <a href="lms-notifications.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">🔔</span>Notifications</a>
+                <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-4 pb-2">Admin</p>
+                <a href="users.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="w-7 text-center text-lg">👤</span>User Accounts</a>
             </nav>
             <div class="p-4 border-t border-gray-800">
                 <div class="flex items-center gap-2 px-2">

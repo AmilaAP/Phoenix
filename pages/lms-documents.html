@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Documents – Phoenix LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .card-anim {
+            animation: fadeUp .4s ease both
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(.95)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        .modal-enter {
+            animation: scaleIn .2s cubic-bezier(.4, 0, .2, 1) forwards
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 99px
+        }
+
+        .doc-card {
+            transition: transform .2s, box-shadow .2s, border-color .2s
+        }
+
+        .doc-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, .4);
+            border-color: rgba(99, 102, 241, .4)
+        }
+    </style>
+    <script>
+        (function () { try { const s = JSON.parse(localStorage.getItem('phoenixSession') || 'null'); if (!s && !localStorage.getItem('phoenixAuth')) location.replace('../login.html'); } catch { location.replace('../login.html'); } }());
+        function toggleSidebar() { document.getElementById('sidebar')?.classList.toggle('-translate-x-full'); document.getElementById('overlay')?.classList.toggle('hidden'); }
+        function closeSidebar() { document.getElementById('sidebar')?.classList.add('-translate-x-full'); document.getElementById('overlay')?.classList.add('hidden'); }
+        function logout() { localStorage.clear(); location.replace('../login.html'); }
+    </script>
+</head>
+
+<body class="bg-gray-950 text-gray-100 antialiased">
+    <div class="lg:flex lg:h-screen">
+        <div id="overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="closeSidebar()"></div>
+        <!-- Sidebar -->
+        <aside id="sidebar"
+            class="fixed lg:sticky top-0 left-0 h-screen w-64 bg-gray-900 border-r border-gray-800 flex flex-col z-50 -translate-x-full lg:translate-x-0 transition-transform duration-300 shrink-0">
+            <div class="p-5 border-b border-gray-800 flex items-center gap-3">
+                <img src="../asset/phoenixlogo.jpg" alt="Phoenix" class="w-9 h-9 rounded-xl object-cover shrink-0"
+                    onerror="this.style.display='none'">
+                <div>
+                    <div class="font-bold text-white text-sm">Phoenix Institute</div>
+                    <div class="text-[11px] text-gray-500">Learning Portal</div>
+                </div>
+            </div>
+            <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
+                <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-3 pb-2">Learning</p>
+                <a href="lms-portal.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm transition-colors"><span
+                        class="text-lg w-7 text-center">🏠</span>Home</a>
+                <a href="lms-lessons.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm transition-colors"><span
+                        class="text-lg w-7 text-center">📚</span>Lessons</a>
+                <a href="lms-results.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm transition-colors"><span
+                        class="text-lg w-7 text-center">📝</span>My Results</a>
+                <a href="lms-documents.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold"><span
+                        class="text-lg w-7 text-center">📁</span>Documents</a>
+                <a href="lms-notifications.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm transition-colors"><span
+                        class="text-lg w-7 text-center">🔔</span>Announcements</a>
+                <div id="adminNav"></div>
+            </nav>
+            <div class="p-4 border-t border-gray-800">
+                <div class="flex items-center gap-2 px-2">
+                    <div id="avatarCircle"
+                        class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold shrink-0">
+                        ?</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs font-semibold text-white truncate" id="sidebarUser">Loading…</div>
+                        <div class="text-[10px] text-gray-500" id="sidebarRole">Student</div>
+                    </div>
+                    <button onclick="logout()"
+                        class="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-red-500/20 hover:text-red-400 text-gray-500 text-sm shrink-0">↩</button>
+                </div>
+            </div>
+        </aside>
+        <!-- Main -->
+        <div class="flex-1 flex flex-col min-h-screen lg:overflow-y-auto">
+            <header
+                class="lg:hidden sticky top-0 z-30 bg-gray-900/95 backdrop-blur border-b border-gray-800 px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()"
+                        class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-800"><svg width="18"
+                            height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 5h12M3 9h12M3 13h12" />
+                        </svg></button>
+                    <span class="font-bold text-white">Documents</span>
+                </div>
+                <button id="mobileAddBtn"
+                    class="hidden text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg font-medium"
+                    onclick="openAdd()">+ Add</button>
+            </header>
+            <header
+                class="hidden lg:flex sticky top-0 z-30 bg-gray-900/80 backdrop-blur border-b border-gray-800 px-8 py-4 items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-bold text-white">Documents & Resources</h1>
+                    <p class="text-sm text-gray-500" id="countBadge">Loading…</p>
+                </div>
+                <button id="desktopAddBtn"
+                    class="hidden items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
+                    onclick="openAdd()">+ Add Document</button>
+            </header>
+            <div class="flex-1 p-4 lg:p-8 pb-28 lg:pb-8">
+                <!-- Storage info banner -->
+                <div class="bg-sky-500/5 border border-sky-500/20 rounded-2xl p-4 mb-6 flex items-start gap-3">
+                    <span class="text-sky-400 text-xl shrink-0">📎</span>
+                    <div class="text-xs text-sky-300/80">Documents are linked via <strong>Google Drive</strong>. Upload
+                        your files to Google Drive or any cloud storage, then share the link here. This is completely
+                        free and unlimited.</div>
+                </div>
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <div class="relative flex-1 min-w-[180px]">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">🔍</span>
+                        <input id="q" type="text" placeholder="Search documents…" oninput="filterD()"
+                            class="w-full bg-gray-900 border border-gray-700 rounded-xl pl-9 pr-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <select id="fCat" onchange="filterD()"
+                        class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-indigo-500">
+                        <option value="">All Categories</option>
+                        <option>Notes</option>
+                        <option>Papers</option>
+                        <option>Worksheets</option>
+                        <option>Syllabus</option>
+                        <option>Other</option>
+                    </select>
+                    <select id="fSub" onchange="filterD()"
+                        class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-indigo-500">
+                        <option value="">All Subjects</option>
+                        <option>Science</option>
+                        <option>Maths</option>
+                        <option>Tamil</option>
+                        <option>English</option>
+                    </select>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="docsGrid">
+                    <div class="col-span-full flex items-center justify-center py-20 text-gray-600">
+                        <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z" />
+                        </svg>Loading…
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Mobile Nav -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-gray-900/95 border-t border-gray-800 backdrop-blur-sm z-40">
+        <div class="flex items-center justify-around px-1 py-1">
+            <a href="lms-portal.html"
+                class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">🏠</span><span class="text-[10px]">Home</span></a>
+            <a href="lms-lessons.html"
+                class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">📚</span><span class="text-[10px]">Lessons</span></a>
+            <a href="lms-results.html"
+                class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">📝</span><span class="text-[10px]">Results</span></a>
+            <a href="lms-documents.html"
+                class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-indigo-400"><span
+                    class="text-xl">📁</span><span class="text-[10px] font-semibold">Docs</span></a>
+            <a href="lms-notifications.html"
+                class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-gray-500"><span
+                    class="text-xl">🔔</span><span class="text-[10px]">Alerts</span></a>
+        </div>
+    </nav>
+    <!-- Add/Edit Modal -->
+    <div id="modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div
+            class="modal-enter bg-gray-900 border border-gray-700 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-xl max-h-[95vh] overflow-y-auto shadow-2xl">
+            <div
+                class="flex items-center justify-between px-6 py-4 border-b border-gray-800 sticky top-0 bg-gray-900 rounded-t-3xl sm:rounded-t-2xl">
+                <h2 class="font-bold text-white text-base" id="modalTitle">Add Document</h2>
+                <button onclick="closeModal()"
+                    class="w-8 h-8 flex items-center justify-center rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-400 text-lg">✕</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="hidden" id="editId">
+                <div><label class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Document
+                        Title *</label>
+                    <input id="docTitle"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+                        placeholder="e.g. Science Notes Chapter 5">
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div><label
+                            class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Category</label>
+                        <select id="category"
+                            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                            <option value="">General</option>
+                            <option>Notes</option>
+                            <option>Papers</option>
+                            <option>Worksheets</option>
+                            <option>Syllabus</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div><label
+                            class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Subject</label>
+                        <select id="subject"
+                            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                            <option value="">All</option>
+                            <option>Science</option>
+                            <option>Maths</option>
+                            <option>Tamil</option>
+                            <option>English</option>
+                        </select>
+                    </div>
+                    <div><label
+                            class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Grade</label>
+                        <div class="grid grid-cols-4 gap-1.5 bg-gray-800 border border-gray-700 rounded-xl p-2.5">
+                            <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer"><input
+                                    type="checkbox" class="grade-chk rounded" value="All" checked> All</label>
+                            <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer"><input
+                                    type="checkbox" class="grade-chk rounded" value="6"> Gr 6</label>
+                            <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer"><input
+                                    type="checkbox" class="grade-chk rounded" value="7"> Gr 7</label>
+                            <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer"><input
+                                    type="checkbox" class="grade-chk rounded" value="8"> Gr 8</label>
+                            <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer"><input
+                                    type="checkbox" class="grade-chk rounded" value="9"> Gr 9</label>
+                            <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer"><input
+                                    type="checkbox" class="grade-chk rounded" value="10"> Gr 10</label>
+                            <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer"><input
+                                    type="checkbox" class="grade-chk rounded" value="11"> Gr 11</label>
+                        </div>
+                        <p class="text-[11px] text-gray-600 mt-1">Check 'All' to release to every grade</p>
+                    </div>
+                </div>
+                <div><label class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Google
+                        Drive / Cloud Link *</label>
+                    <input id="fileUrl" type="url"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500"
+                        placeholder="https://drive.google.com/file/...">
+                    <p class="text-[11px] text-gray-600 mt-1.5">Upload to Google Drive → Share → "Anyone with link" →
+                        copy URL</p>
+                </div>
+                <div><label
+                        class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Description</label>
+                    <textarea id="description" rows="2"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 resize-none"
+                        placeholder="Brief description…"></textarea>
+                </div>
+                <div class="flex items-center justify-between bg-gray-800 border border-gray-700 rounded-xl px-4 py-3">
+                    <div>
+                        <div class="text-sm font-semibold text-white">Published</div>
+                        <div class="text-[11px] text-gray-500 mt-0.5">Students can see and download this</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-3">
+                        <input type="checkbox" id="chkPublished" class="sr-only peer" checked>
+                        <div
+                            class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500">
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div
+                class="flex items-center gap-3 px-6 py-4 border-t border-gray-800 sticky bottom-0 bg-gray-900 rounded-b-2xl">
+                <button onclick="closeModal()"
+                    class="flex-1 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium transition-colors">Cancel</button>
+                <button onclick="saveDoc()" id="saveBtn"
+                    class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors"><span
+                        id="saveTxt">Add Document</span></button>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import { collection, addDoc, updateDoc, deleteDoc, getDocs, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { db } from "../js/firebase-config.js";
+        import { showToast, confirmAction } from "../js/app.js";
+
+        const session = (() => { try { return JSON.parse(localStorage.getItem('phoenixSession') || 'null'); } catch { return null; } })();
+        const isAdmin = session?.role === 'admin' || localStorage.getItem('phoenixRole') === 'admin';
+
+        if (session) { const n = session.displayName || session.username || 'Student'; document.getElementById('sidebarUser').textContent = n; document.getElementById('avatarCircle').textContent = n[0].toUpperCase(); document.getElementById('sidebarRole').textContent = session.role === 'admin' ? '🛡️ Administrator' : '🎓 Student'; }
+        if (isAdmin) {
+            document.getElementById('desktopAddBtn').style.display = 'flex';
+            document.getElementById('mobileAddBtn').classList.remove('hidden');
+            document.getElementById('adminNav').innerHTML = `<p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-4 pb-2">Admin</p>
+      <a href="../index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm transition-colors"><span class="text-lg w-7 text-center">📊</span>Dashboard</a>
+      <a href="users.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm transition-colors"><span class="text-lg w-7 text-center">👤</span>User Accounts</a>
+      <a href="students.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm transition-colors"><span class="text-lg w-7 text-center">👨‍🎓</span>Students</a>`;
+        }
+
+        const CAT_ICON = { Notes: '📝', Papers: '📄', Worksheets: '📋', Syllabus: '🗂️', Other: '📎' };
+        const SUBJ_STYLE = { Science: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20', Maths: 'text-amber-400 bg-amber-500/10 border-amber-500/20', Tamil: 'text-sky-400 bg-sky-500/10 border-sky-500/20', English: 'text-violet-400 bg-violet-500/10 border-violet-500/20' };
+
+        let all = [];
+
+        async function load() {
+            const snap = await getDocs(query(collection(db, 'lms_documents'), orderBy('createdAt', 'desc')));
+            all = []; snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+            let studentGrade = null, studentSubjects = [];
+            if (!isAdmin && session?.studentId) {
+                try {
+                    const fiMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+                    const sDoc = await fiMod.getDoc(fiMod.doc(db, 'students', session.studentId));
+                    if (sDoc.exists()) { const sd = sDoc.data(); studentGrade = String(sd.grade || ''); studentSubjects = sd.subjects || [sd.subject || ''].filter(Boolean); }
+                } catch { }
+            }
+            const visible = all.filter(d => {
+                if (!isAdmin && d.published === false) return false;
+                if (!isAdmin) {
+                    const tg = d.targetGrades || (d.grade ? [d.grade] : []);
+                    const gradeOk = tg.includes('All') || !studentGrade || tg.includes(studentGrade);
+                    const subOk = !d.subject || !studentSubjects.length || studentSubjects.includes(d.subject);
+                    return gradeOk && subOk;
+                }
+                return true;
+            });
+            render(visible);
+            document.getElementById('countBadge').textContent = `${visible.length} document${visible.length !== 1 ? 's' : ''}`;
+        }
+
+        function render(list) {
+            const g = document.getElementById('docsGrid');
+            if (!list.length) { g.innerHTML = `<div class="col-span-full text-center py-20 text-gray-600"><div class="text-5xl mb-4 opacity-30">📁</div><div class="font-medium text-gray-500">No documents found</div></div>`; return; }
+            g.innerHTML = list.map((d, i) => {
+                const catIcon = CAT_ICON[d.category] || '📎';
+                const subjStyle = SUBJ_STYLE[d.subject] || 'text-gray-400 bg-gray-700 border-gray-600';
+                const draft = (!d.published && isAdmin) ? `<span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full">Draft</span>` : '';
+                const adminBtns = isAdmin ? `<div class="flex items-center gap-1 pt-3 mt-1 border-t border-gray-700/50">
+        <button onclick="editDoc('${d.id}')" class="flex-1 py-1.5 rounded-lg bg-gray-700 hover:bg-indigo-500/30 hover:text-indigo-400 text-gray-400 text-xs transition-colors">✏️ Edit</button>
+        <button onclick="delDoc('${d.id}')" class="flex-1 py-1.5 rounded-lg bg-gray-700 hover:bg-red-500/30 hover:text-red-400 text-gray-400 text-xs transition-colors">🗑️ Delete</button></div>` : '';
+                return `<div class="doc-card bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col card-anim" style="animation-delay:${i * .04}s">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl shrink-0">${catIcon}</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap mb-1">
+              ${d.subject ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded-lg ${subjStyle} border">${d.subject}</span>` : ''}
+              ${d.category ? `<span class="text-[11px] text-gray-500 bg-gray-800 px-2 py-0.5 rounded-lg border border-gray-700">${d.category}</span>` : ''}
+              ${d.grade && d.grade !== 'All' ? `<span class="text-[11px] text-gray-600 bg-gray-800 px-2 py-0.5 rounded-lg border border-gray-700">Gr ${d.grade}</span>` : ''}
+              ${draft}
+            </div>
+            <h3 class="font-bold text-white text-sm leading-snug">${d.docTitle || 'Untitled'}</h3>
+          </div>
+        </div>
+        ${d.description ? `<p class="text-xs text-gray-500 mb-3 line-clamp-2">${d.description}</p>` : ''}
+        <div class="mt-auto pt-3 flex items-center gap-2">
+          <a href="${d.fileUrl}" target="_blank" class="flex-1 py-2 rounded-xl bg-indigo-600/80 hover:bg-indigo-600 text-white text-xs font-semibold text-center transition-colors">📥 Open / Download</a>
+        </div>
+        ${adminBtns}
+      </div>`;
+            }).join('');
+        }
+
+        window.filterD = function () {
+            const q = document.getElementById('q').value.toLowerCase();
+            const fc = document.getElementById('fCat').value;
+            const fs = document.getElementById('fSub').value;
+            render(all.filter(d => {
+                if (!isAdmin && d.published === false) return false;
+                return (!q || `${d.docTitle || ''} ${d.description || ''} ${d.category || ''}`.toLowerCase().includes(q))
+                    && (!fc || d.category === fc)
+                    && (!fs || d.subject === fs);
+            }));
+        };
+
+        window.openAdd = function () {
+            document.getElementById('editId').value = '';
+            ['docTitle', 'fileUrl', 'description'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+            document.getElementById('category').value = '';
+            document.getElementById('subject').value = '';
+            document.querySelectorAll('.grade-chk').forEach(c => c.checked = c.value === 'All');
+            document.getElementById('chkPublished').checked = true;
+            document.getElementById('modalTitle').textContent = 'Add Document';
+            document.getElementById('saveTxt').textContent = 'Add Document';
+            document.getElementById('modal').classList.remove('hidden'); document.body.style.overflow = 'hidden';
+        };
+        window.closeModal = function () { document.getElementById('modal').classList.add('hidden'); document.body.style.overflow = ''; };
+
+        window.editDoc = function (id) {
+            const d = all.find(x => x.id === id); if (!d) return;
+            document.getElementById('editId').value = id;
+            document.getElementById('docTitle').value = d.docTitle || '';
+            document.getElementById('category').value = d.category || '';
+            document.getElementById('subject').value = d.subject || '';
+            const tg = d.targetGrades || (d.grade ? [d.grade] : ['All']);
+            document.querySelectorAll('.grade-chk').forEach(c => c.checked = tg.includes(c.value));
+            document.getElementById('fileUrl').value = d.fileUrl || '';
+            document.getElementById('description').value = d.description || '';
+            document.getElementById('chkPublished').checked = d.published !== false;
+            document.getElementById('modalTitle').textContent = 'Edit Document';
+            document.getElementById('saveTxt').textContent = 'Save Changes';
+            document.getElementById('modal').classList.remove('hidden'); document.body.style.overflow = 'hidden';
+        };
+
+        window.saveDoc = async function () {
+            const docTitle = document.getElementById('docTitle').value.trim();
+            const fileUrl = document.getElementById('fileUrl').value.trim();
+            const editId = document.getElementById('editId').value;
+            if (!docTitle) { showToast('Title required', 'error'); return; }
+            if (!fileUrl) { showToast('File URL required', 'error'); return; }
+            const btn = document.getElementById('saveBtn'); btn.disabled = true;
+            const checkedGrades = [...document.querySelectorAll('.grade-chk:checked')].map(c => c.value);
+            const targetGrades = checkedGrades.length ? checkedGrades : ['All'];
+            const data = { docTitle, category: document.getElementById('category').value, subject: document.getElementById('subject').value, grade: targetGrades.includes('All') ? 'All' : targetGrades[0], targetGrades, fileUrl, description: document.getElementById('description').value.trim(), published: document.getElementById('chkPublished').checked };
+            try {
+                if (editId) { await updateDoc(doc(db, 'lms_documents', editId), { ...data, updatedAt: serverTimestamp() }); showToast('Document updated', 'success'); }
+                else { data.createdAt = serverTimestamp(); await addDoc(collection(db, 'lms_documents'), data); showToast('Document added', 'success'); }
+                closeModal(); await load();
+            } catch (e) { showToast('Save failed: ' + e.message, 'error'); }
+            finally { btn.disabled = false; }
+        };
+
+        window.delDoc = async function (id) {
+            const d = all.find(x => x.id === id);
+            if (!await confirmAction(`Delete <strong>${d?.docTitle}</strong>?`)) return;
+            try { await deleteDoc(doc(db, 'lms_documents', id)); showToast('Document deleted', 'info'); await load(); }
+            catch (e) { showToast('Delete failed', 'error'); }
+        };
+
+        load();
+    </script>
+</body>
+
+</html>

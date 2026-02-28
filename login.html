@@ -8,10 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
-    <script>
-        // Already logged in → go straight to dashboard
-        if (localStorage.getItem('phoenixAuth')) location.replace('index.html');
-    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -31,7 +27,6 @@
             overflow: hidden;
         }
 
-        /* Subtle dot grid */
         body::before {
             content: '';
             position: fixed;
@@ -41,7 +36,6 @@
             pointer-events: none;
         }
 
-        /* Ambient glow orbs */
         .orb {
             position: fixed;
             border-radius: 50%;
@@ -284,38 +278,31 @@
 </head>
 
 <body>
-    <!-- Ambient orbs -->
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
 
     <div style="width:100%;max-width:380px;position:relative;z-index:10;">
 
-        <!-- Branding -->
         <div style="text-align:center;margin-bottom:2rem;">
             <img src="asset/phoenixlogo.jpg" alt="Phoenix Education Institute" class="logo-ring"
-                style="width:68px;height:68px;border-radius:1.25rem;object-fit:cover;margin:0 auto 1rem;display:block;">
+                style="width:68px;height:68px;border-radius:1.25rem;object-fit:cover;margin:0 auto 1rem;display:block;"
+                onerror="this.style.display='none'">
             <h1 style="color:#f8fafc;font-size:1.5rem;font-weight:800;margin:0 0 .25rem;">Phoenix Education Institute
             </h1>
-            <p style="color:rgba(148,163,184,.6);font-size:.8rem;margin:0;">Student Management System</p>
+            <p style="color:rgba(148,163,184,.6);font-size:.8rem;margin:0;">Learning Management System</p>
         </div>
 
-        <!-- Card -->
         <div class="card" id="loginCard" style="padding:1.75rem;">
             <h2 style="color:#f1f5f9;font-size:1rem;font-weight:700;margin:0 0 .25rem;">Welcome back 👋</h2>
-            <p style="color:rgba(148,163,184,.55);font-size:.78rem;margin:0 0 1.5rem;">Sign in to access the dashboard
-            </p>
+            <p style="color:rgba(148,163,184,.55);font-size:.78rem;margin:0 0 1.5rem;">Sign in to access your portal</p>
 
-            <!-- Error -->
             <div class="error-box" id="errBox">
                 <span style="font-size:1rem;">🔒</span>
                 <span id="errTxt">Invalid credentials</span>
             </div>
 
-            <!-- Form -->
             <form onsubmit="doLogin(event)">
-
-                <!-- Username -->
                 <div style="margin-bottom:1rem;">
                     <label class="label" for="uname">Username</label>
                     <div style="position:relative;">
@@ -326,7 +313,6 @@
                     </div>
                 </div>
 
-                <!-- Password -->
                 <div style="margin-bottom:1.5rem;">
                     <label class="label" for="pwd">Password</label>
                     <div style="position:relative;">
@@ -338,34 +324,38 @@
                     </div>
                 </div>
 
-                <!-- Submit -->
                 <button type="submit" class="btn-primary" id="loginBtn">
                     <span id="btnContent">Sign In →</span>
                 </button>
             </form>
         </div>
 
-        <!-- Footer -->
         <p style="text-align:center;font-size:.72rem;color:rgba(100,116,139,.5);margin-top:1.5rem;">
-            Phoenix Education Institute © 2026 &nbsp;·&nbsp; Student Management System v1.0
+            Phoenix Education Institute © 2026 &nbsp;·&nbsp; LMS v2.0
         </p>
     </div>
 
-    <script>
-        // ─────────────────────────────────────────────────────────────────────────
-        //  ADMIN CREDENTIALS  —  change these to your preferred username/password
-        // ─────────────────────────────────────────────────────────────────────────
-        const CREDENTIALS = {
-            'admin': 'Phoenix@2024'
-        };
+    <script type="module">
+        import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { db } from "./js/firebase-config.js";
+
+        // If session already exists, redirect accordingly
+        const existingSession = (() => {
+            try { return JSON.parse(localStorage.getItem('phoenixSession') || 'null'); } catch { return null; }
+        })();
+        if (existingSession) {
+            location.replace(existingSession.role === 'admin' ? 'index.html' : 'pages/lms-portal.html');
+        } else if (localStorage.getItem('phoenixAuth')) {
+            location.replace('index.html');
+        }
 
         let pwdVisible = false;
 
-        function togglePwd() {
+        window.togglePwd = function () {
             pwdVisible = !pwdVisible;
             document.getElementById('pwd').type = pwdVisible ? 'text' : 'password';
             document.getElementById('eyeBtn').textContent = pwdVisible ? '🙈' : '👁️';
-        }
+        };
 
         function showError(msg) {
             const box = document.getElementById('errBox');
@@ -373,44 +363,77 @@
             box.classList.add('visible');
             const card = document.getElementById('loginCard');
             card.classList.remove('shake');
-            void card.offsetWidth; // reflow to restart animation
+            void card.offsetWidth;
             card.classList.add('shake');
         }
 
-        function doLogin(e) {
+        window.doLogin = async function (e) {
             e.preventDefault();
-            const uname = document.getElementById('uname').value.trim();
+            const uname = document.getElementById('uname').value.trim().toLowerCase();
             const pwd = document.getElementById('pwd').value;
             const btn = document.getElementById('loginBtn');
 
             if (!uname) { showError('Please enter your username.'); document.getElementById('uname').focus(); return; }
             if (!pwd) { showError('Please enter your password.'); document.getElementById('pwd').focus(); return; }
 
-            // Show loading state
             btn.disabled = true;
             document.getElementById('btnContent').innerHTML = '<span class="spinner"></span>Signing in…';
             document.getElementById('errBox').classList.remove('visible');
 
-            // Slight delay for UX feel
-            setTimeout(() => {
-                if (CREDENTIALS[uname] !== undefined && CREDENTIALS[uname] === pwd) {
-                    // ✅ Valid — store session and redirect
+            try {
+                // First: try Firestore users collection
+                const q = query(collection(db, 'users'), where('username', '==', uname));
+                const snap = await getDocs(q);
+
+                if (!snap.empty) {
+                    const userDoc = snap.docs[0].data();
+                    if (userDoc.password === pwd && userDoc.active !== false) {
+                        const session = {
+                            uid: snap.docs[0].id,
+                            username: userDoc.username,
+                            displayName: userDoc.displayName || userDoc.username,
+                            role: userDoc.role || 'student',
+                            studentId: userDoc.studentId || null,
+                        };
+                        localStorage.setItem('phoenixSession', JSON.stringify(session));
+                        localStorage.setItem('phoenixAuth', 'true');
+                        localStorage.setItem('phoenixRole', session.role);
+                        localStorage.setItem('phoenixUser', session.username);
+                        location.replace(session.role === 'admin' ? 'index.html' : 'pages/lms-portal.html');
+                        return;
+                    } else {
+                        throw new Error('wrong_password');
+                    }
+                }
+
+                // Fallback: legacy hardcoded admin
+                const LEGACY = { 'admin': 'Phoenix@2024' };
+                if (LEGACY[uname] !== undefined && LEGACY[uname] === pwd) {
+                    const session = { uid: 'admin', username: 'admin', displayName: 'Admin', role: 'admin', studentId: null };
+                    localStorage.setItem('phoenixSession', JSON.stringify(session));
                     localStorage.setItem('phoenixAuth', 'true');
                     localStorage.setItem('phoenixRole', 'admin');
-                    localStorage.setItem('phoenixUser', uname);
+                    localStorage.setItem('phoenixUser', 'admin');
                     location.replace('index.html');
-                } else {
-                    // ❌ Invalid
-                    btn.disabled = false;
-                    document.getElementById('btnContent').textContent = 'Sign In →';
-                    showError('Incorrect username or password. Please try again.');
-                    document.getElementById('pwd').value = '';
-                    document.getElementById('pwd').focus();
+                    return;
                 }
-            }, 500);
-        }
 
-        // Auto-focus username on load
+                throw new Error('not_found');
+            } catch (err) {
+                btn.disabled = false;
+                document.getElementById('btnContent').textContent = 'Sign In →';
+                if (err.message === 'wrong_password') {
+                    showError('Incorrect password. Please try again.');
+                } else if (err.message === 'not_found') {
+                    showError('Incorrect username or password. Please try again.');
+                } else {
+                    showError('Login error: ' + err.message);
+                }
+                document.getElementById('pwd').value = '';
+                document.getElementById('pwd').focus();
+            }
+        };
+
         document.getElementById('uname').focus();
     </script>
 </body>

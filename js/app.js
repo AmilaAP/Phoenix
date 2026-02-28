@@ -114,9 +114,40 @@ export function getSubjects(student) {
     if (student.subject === 'Maths') return ['Maths'];
     if (student.subject === 'Tamil') return ['Tamil'];
     if (student.subject === 'English') return ['English'];
-    return ['Science'];
+    return [];   // ← fixed: no default subject; prevents ghost Science matches
 }
 window.getSubjects = getSubjects;
+
+// ── Auth helpers ─────────────────────────────────────────────────────
+export function getSession() {
+    try { return JSON.parse(localStorage.getItem('phoenixSession') || 'null'); } catch { return null; }
+}
+export function setSession(u) { localStorage.setItem('phoenixSession', JSON.stringify(u)); }
+export function clearSession() {
+    localStorage.removeItem('phoenixSession');
+    localStorage.removeItem('phoenixAuth');
+    localStorage.removeItem('phoenixRole');
+    localStorage.removeItem('phoenixUser');
+}
+export function requireAdmin() {
+    const s = getSession();
+    if (!s || s.role !== 'admin') { location.replace('../login.html'); return false; }
+    return true;
+}
+export function requireAuth() {
+    const s = getSession();
+    const legacy = localStorage.getItem('phoenixAuth');
+    if (!s && !legacy) { location.replace('../login.html'); return false; }
+    return true;
+}
+export function requireAuthFromRoot() {
+    const s = getSession();
+    const legacy = localStorage.getItem('phoenixAuth');
+    if (!s && !legacy) { location.replace('login.html'); return false; }
+    return true;
+}
+window.getSession = getSession;
+window.clearSession = clearSession;
 
 // ── Subject style map — use for consistent badge colours everywhere ───
 export const subjectStyle = {
