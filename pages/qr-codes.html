@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Codes – Phonex Institute</title>
+    <meta name="description" content="Generate and print QR codes for all students at Phonex Institute.">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">
+                    <h2>Phonex</h2>
+                    <p>Institute System</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="../index.html" class="nav-link">
+                    <div class="nav-icon">📊</div> Dashboard
+                </a>
+                <a href="students.html" class="nav-link">
+                    <div class="nav-icon">👨‍🎓</div> Students
+                </a>
+                <a href="attendance.html" class="nav-link">
+                    <div class="nav-icon">📋</div> Attendance
+                </a>
+                <a href="payments.html" class="nav-link">
+                    <div class="nav-icon">💳</div> Payments
+                </a>
+                <div class="nav-section-title" style="margin-top:8px">Scanner</div>
+                <a href="scanner.html" class="nav-link">
+                    <div class="nav-icon">📷</div> QR Scanner
+                </a>
+                <a href="qr-codes.html" class="nav-link active">
+                    <div class="nav-icon">🔲</div> QR Codes
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar">A</div>
+                    <div>
+                        <div style="font-size:13px;font-weight:600">Admin</div>
+                        <div style="font-size:11px;color:var(--text-muted)">Institute Manager</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <div class="topbar-left">
+                        <h1>Student QR Codes</h1>
+                        <p>Generate and print QR codes for attendance</p>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print All</button>
+                </div>
+            </div>
+
+            <div class="page-content">
+
+                <!-- Filters -->
+                <div class="filters-bar" style="margin-bottom:20px">
+                    <div class="search-input-wrapper" style="max-width:280px">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search students…">
+                    </div>
+                    <select class="form-control" id="filterSubject" style="width:auto;min-width:130px">
+                        <option value="">All Subjects</option>
+                        <option value="Science">Science</option>
+                        <option value="Maths">Maths</option>
+                        <option value="Both">Both</option>
+                    </select>
+                    <select class="form-control" id="filterGrade" style="width:auto;min-width:120px">
+                        <option value="">All Grades</option>
+                        <option value="6">Grade 6</option>
+                        <option value="7">Grade 7</option>
+                        <option value="8">Grade 8</option>
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option>
+                    </select>
+                </div>
+
+                <div id="qrGrid"
+                    style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">
+                    <div class="page-loading" style="grid-column:1/-1">
+                        <div class="loading-spinner"></div> Loading students…
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* QR card print styles */
+        .qr-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            transition: all var(--transition);
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+        }
+
+        .qr-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-glow);
+            border-color: var(--border-active);
+        }
+
+        .qr-card .student-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .qr-card canvas {
+            border-radius: 8px;
+        }
+
+        .qr-card .download-btn {
+            width: 100%;
+        }
+
+        @media print {
+
+            .sidebar,
+            .topbar,
+            .filters-bar,
+            .download-btn {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            #qrGrid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 8px !important;
+                padding: 0 !important;
+            }
+
+            .qr-card {
+                break-inside: avoid;
+                border: 1px solid #ccc;
+            }
+
+            .qr-card canvas {
+                width: 160px !important;
+                height: 160px !important;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { firebaseConfig } from "../js/firebase-config.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let allStudents = [];
+
+        async function loadStudents() {
+            const grid = document.getElementById('qrGrid');
+            try {
+                const snap = await getDocs(query(collection(db, 'students'), orderBy('createdAt', 'desc')));
+                allStudents = [];
+                snap.forEach(d => allStudents.push({ id: d.id, ...d.data() }));
+                renderCards(allStudents);
+            } catch (err) {
+                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">⚠️</div>
+      <h3>Firebase not configured</h3>
+      <p>Please set up your Firebase credentials in <code>js/firebase-config.js</code></p>
+    </div>`;
+            }
+        }
+
+        function renderCards(students) {
+            const grid = document.getElementById('qrGrid');
+            if (students.length === 0) {
+                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">🔲</div>
+      <h3>No Students Found</h3>
+      <p>Add students first, then generate their QR codes.</p>
+    </div>`;
+                return;
+            }
+
+            grid.innerHTML = students.map(s => `
+    <div class="qr-card" id="card-${s.id}">
+      <div>
+        <div class="student-name">${s.firstName} ${s.lastName}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
+          Grade ${s.grade} • ${s.subject}
+        </div>
+      </div>
+      <canvas id="qr-${s.id}" style="width:180px;height:180px"></canvas>
+      <div style="font-size:10px;color:var(--text-muted);word-break:break-all;max-width:200px">
+        ${s.id.toUpperCase()}
+      </div>
+      <div style="display:flex;gap:6px;width:100%">
+        <button class="btn btn-ghost btn-sm download-btn" onclick="downloadQr('${s.id}','${s.firstName} ${s.lastName}')">
+          ⬇ Download
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+            // Generate QR codes
+            students.forEach(s => {
+                const canvas = document.getElementById(`qr-${s.id}`);
+                QRCode.toCanvas(canvas, s.id, {
+                    width: 180,
+                    margin: 1,
+                    color: { dark: '#1e1e2e', light: '#ffffff' }
+                }, err => {
+                    if (err) console.error('QR gen error:', err);
+                });
+            });
+        }
+
+        // ── Download individual QR ───────────────────────────────────
+        window.downloadQr = function (studentId, name) {
+            const canvas = document.getElementById(`qr-${studentId}`);
+            const link = document.createElement('a');
+            link.download = `QR_${name.replace(/\s+/g, '_')}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        };
+
+        // ── Filters ──────────────────────────────────────────────────
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const subject = document.getElementById('filterSubject').value;
+            const grade = document.getElementById('filterGrade').value;
+
+            const filtered = allStudents.filter(s => {
+                const matchSearch = !search || `${s.firstName} ${s.lastName}`.toLowerCase().includes(search);
+                const matchSubject = !subject || s.subject === subject || s.subject === 'Both';
+                const matchGrade = !grade || String(s.grade) === grade;
+                return matchSearch && matchSubject && matchGrade;
+            });
+            renderCards(filtered);
+        }
+
+        ['searchInput', 'filterSubject', 'filterGrade'].forEach(id =>
+            document.getElementById(id)?.addEventListener('input', applyFilters)
+        );
+
+        // ── Init ─────────────────────────────────────────────────────
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        mobileBtn?.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('open'); });
+        overlay?.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('open'); });
+
+        loadStudents();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments – Phonex Institute</title>
+    <meta name="description" content="Track monthly class fee payments for Phonex Institute students.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">
+                    <h2>Phonex</h2>
+                    <p>Institute System</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="../index.html" class="nav-link">
+                    <div class="nav-icon">📊</div> Dashboard
+                </a>
+                <a href="students.html" class="nav-link">
+                    <div class="nav-icon">👨‍🎓</div> Students
+                </a>
+                <a href="attendance.html" class="nav-link">
+                    <div class="nav-icon">📋</div> Attendance
+                </a>
+                <a href="payments.html" class="nav-link active">
+                    <div class="nav-icon">💳</div> Payments
+                </a>
+                <div class="nav-section-title" style="margin-top:8px">Scanner</div>
+                <a href="scanner.html" class="nav-link">
+                    <div class="nav-icon">📷</div> QR Scanner
+                </a>
+                <a href="qr-codes.html" class="nav-link">
+                    <div class="nav-icon">🔲</div> QR Codes
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar">A</div>
+                    <div>
+                        <div style="font-size:13px;font-weight:600">Admin</div>
+                        <div style="font-size:11px;color:var(--text-muted)">Institute Manager</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <div class="topbar-left">
+                        <h1>Payments</h1>
+                        <p>Monthly class fee tracking</p>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <select class="form-control" id="monthSelector" style="width:auto;min-width:160px"></select>
+                </div>
+            </div>
+
+            <div class="page-content">
+
+                <!-- Stats -->
+                <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+                    <div class="stat-card">
+                        <div class="stat-icon green">💚</div>
+                        <div class="stat-info">
+                            <h3 id="statPaid">–</h3>
+                            <p>Paid</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">❤️</div>
+                        <div class="stat-info">
+                            <h3 id="statUnpaid">–</h3>
+                            <p>Unpaid</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">💰</div>
+                        <div class="stat-info">
+                            <h3 id="statAmount">–</h3>
+                            <p>Collected (Rs.)</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">📊</div>
+                        <div class="stat-info">
+                            <h3 id="statRateP">–%</h3>
+                            <p>Collection Rate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-bar" style="margin-bottom:16px">
+                    <div class="search-input-wrapper" style="max-width:260px">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search student…">
+                    </div>
+                    <select class="form-control" id="filterStatus" style="width:auto;min-width:130px">
+                        <option value="">All Students</option>
+                        <option value="paid">Paid Only</option>
+                        <option value="unpaid">Unpaid Only</option>
+                    </select>
+                    <select class="form-control" id="filterSubject" style="width:auto;min-width:130px">
+                        <option value="">All Subjects</option>
+                        <option value="Science">Science</option>
+                        <option value="Maths">Maths</option>
+                        <option value="Both">Both</option>
+                    </select>
+                    <select class="form-control" id="filterGrade" style="width:auto;min-width:120px">
+                        <option value="">All Grades</option>
+                        <option value="6">Grade 6</option>
+                        <option value="7">Grade 7</option>
+                        <option value="8">Grade 8</option>
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option>
+                    </select>
+                </div>
+
+                <!-- Progress -->
+                <div class="card" style="margin-bottom:20px">
+                    <div class="card-body" style="padding:16px 24px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                            <span style="font-size:13px;color:var(--text-secondary)">Collection Progress</span>
+                            <span style="font-size:13px;font-weight:600;color:var(--text-primary)"
+                                id="progressLabel">—</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">💳 Payment Status</div>
+                            <div class="card-subtitle" id="paymentSubtitle">Loading...</div>
+                        </div>
+                        <div style="display:flex;gap:8px">
+                            <button class="btn btn-ghost btn-sm" onclick="markAllUnpaid()">Mark All Unpaid</button>
+                            <button class="btn btn-success btn-sm" onclick="markAllPaid()">Mark All Paid</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Student</th>
+                                    <th>Grade</th>
+                                    <th>Subject</th>
+                                    <th>Parent Contact</th>
+                                    <th>Status</th>
+                                    <th>Amount (Rs.)</th>
+                                    <th>Date Paid</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payTableBody">
+                                <tr>
+                                    <td colspan="9">
+                                        <div class="page-loading">
+                                            <div class="loading-spinner"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Payment Modal ── -->
+    <div class="modal-overlay" id="payModal">
+        <div class="modal" style="max-width:440px">
+            <div class="modal-header">
+                <span class="modal-title">💳 Record Payment</span>
+                <button class="modal-close" onclick="closePayModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="payStudentId">
+                <input type="hidden" id="payMonth">
+                <div
+                    style="background:var(--accent-glow);border:1px solid var(--border-active);border-radius:var(--radius-md);padding:14px;margin-bottom:20px">
+                    <div style="font-weight:700;color:var(--text-primary)" id="payStudentName">—</div>
+                    <div style="font-size:12px;color:var(--text-muted)" id="payStudentInfo">—</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount Paid (Rs.) *</label>
+                    <input type="number" class="form-control" id="payAmount" placeholder="2500" min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Payment Date</label>
+                    <input type="date" class="form-control" id="payDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes (optional)</label>
+                    <input type="text" class="form-control" id="payNotes" placeholder="Cash / Bank transfer…">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closePayModal()">Cancel</button>
+                <button class="btn btn-success" onclick="savePay()">✅ Confirm Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import {
+            getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc,
+            doc, query, where, orderBy, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { firebaseConfig } from "../js/firebase-config.js";
+        import { showToast, confirmAction, initials } from "../js/app.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allStudents = [];
+        let paymentMap = {};   // studentId -> payment record
+        let selectedMonth = '';
+
+        // ── Build month selector ──────────────────────────────────────
+        function populateMonthSelector() {
+            const sel = document.getElementById('monthSelector');
+            const now = new Date();
+            for (let i = 0; i < 12; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const label = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                const opt = document.createElement('option');
+                opt.value = val; opt.textContent = label;
+                sel.appendChild(opt);
+            }
+            selectedMonth = sel.value;
+        }
+
+        // ── Load ─────────────────────────────────────────────────────
+        async function loadAll() {
+            try {
+                const [studSnap, paySnap] = await Promise.all([
+                    getDocs(query(collection(db, 'students'), orderBy('createdAt', 'desc'))),
+                    getDocs(query(collection(db, 'payments'), where('month', '==', selectedMonth)))
+                ]);
+
+                allStudents = [];
+                studSnap.forEach(d => allStudents.push({ id: d.id, ...d.data() }));
+
+                paymentMap = {};
+                paySnap.forEach(d => { paymentMap[d.data().studentId] = { id: d.id, ...d.data() }; });
+
+                applyFilters();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('payTableBody').innerHTML =
+                    `<tr><td colspan="9"><div class="empty-state">
+        <div class="empty-icon">⚠️</div><h3>Firebase not configured</h3>
+        <p>Fill in your credentials in <code>js/firebase-config.js</code></p>
+      </div></td></tr>`;
+            }
+        }
+
+        // ── Render ───────────────────────────────────────────────────
+        function renderTable(students) {
+            const tbody = document.getElementById('payTableBody');
+
+            const paid = students.filter(s => paymentMap[s.id]?.paid);
+            const unpaid = students.filter(s => !paymentMap[s.id]?.paid);
+            const total = students.length;
+            const rate = total > 0 ? Math.round((paid.length / total) * 100) : 0;
+            const totalAmt = Object.values(paymentMap).reduce((sum, p) => sum + (p.paid ? (Number(p.amount) || 0) : 0), 0);
+
+            document.getElementById('statPaid').textContent = paid.length;
+            document.getElementById('statUnpaid').textContent = unpaid.length;
+            document.getElementById('statAmount').textContent = totalAmt.toLocaleString();
+            document.getElementById('statRateP').textContent = `${rate}%`;
+            document.getElementById('progressLabel').textContent = `${paid.length} / ${total} paid (${rate}%)`;
+            document.getElementById('progressFill').style.width = `${rate}%`;
+
+            document.getElementById('paymentSubtitle').textContent =
+                `${paid.length} of ${total} students paid for ${selectedMonth}`;
+
+            if (students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state">
+      <div class="empty-icon">💳</div><h3>No Students Found</h3>
+    </div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = [...paid, ...unpaid].map((s, i) => {
+                const pay = paymentMap[s.id];
+                const isPaid = pay?.paid;
+                const ini = initials(s.firstName, s.lastName);
+                const subjectClass = s.subject?.toLowerCase() === 'maths' ? 'maths' : 'science';
+                const datePaid = isPaid && pay.paidDate
+                    ? new Date(pay.paidDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                    : '—';
+
+                return `<tr>
+      <td style="color:var(--text-muted)">${i + 1}</td>
+      <td>
+        <div class="name-cell">
+          <div class="student-avatar" style="${isPaid ? '' : 'opacity:0.6;filter:grayscale(1)'}">${ini}</div>
+          <div>
+            <div class="student-name">${s.firstName} ${s.lastName}</div>
+            <div class="student-id">${s.school || ''}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="grade-pill">Grade ${s.grade}</span></td>
+      <td><span class="subject-pill ${subjectClass}">${s.subject}</span></td>
+      <td style="color:var(--text-muted)">${s.parentContact || '—'}</td>
+      <td>${isPaid
+                        ? '<span class="badge badge-success">✅ Paid</span>'
+                        : '<span class="badge badge-danger">❌ Unpaid</span>'
+                    }</td>
+      <td style="color:var(--text-primary);font-weight:${isPaid ? '600' : '400'}">
+        ${isPaid ? `Rs. ${Number(pay.amount || 0).toLocaleString()}` : '—'}
+      </td>
+      <td style="color:var(--text-muted)">${datePaid}</td>
+      <td>
+        ${isPaid
+                        ? `<button class="btn btn-danger btn-sm" onclick="unmarkPaid('${s.id}')">↩ Unpay</button>`
+                        : `<button class="btn btn-success btn-sm" onclick="openPayModal('${s.id}')">💳 Mark Paid</button>`
+                    }
+      </td>
+    </tr>`;
+            }).join('');
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value;
+            const subject = document.getElementById('filterSubject').value;
+            const grade = document.getElementById('filterGrade').value;
+
+            const filtered = allStudents.filter(s => {
+                const isPaid = paymentMap[s.id]?.paid;
+                const matchSearch = !search || `${s.firstName} ${s.lastName}`.toLowerCase().includes(search);
+                const matchStatus = !status || (status === 'paid' ? isPaid : !isPaid);
+                const matchSubject = !subject || s.subject === subject || s.subject === 'Both';
+                const matchGrade = !grade || String(s.grade) === grade;
+                return matchSearch && matchStatus && matchSubject && matchGrade;
+            });
+            renderTable(filtered);
+        }
+
+        ['searchInput', 'filterStatus', 'filterSubject', 'filterGrade'].forEach(id =>
+            document.getElementById(id)?.addEventListener('input', applyFilters)
+        );
+
+        document.getElementById('monthSelector').addEventListener('change', (e) => {
+            selectedMonth = e.target.value;
+            loadAll();
+        });
+
+        // ── Pay modal ────────────────────────────────────────────────
+        window.openPayModal = function (studentId) {
+            const s = allStudents.find(x => x.id === studentId);
+            if (!s) return;
+            document.getElementById('payStudentId').value = studentId;
+            document.getElementById('payMonth').value = selectedMonth;
+            document.getElementById('payStudentName').textContent = `${s.firstName} ${s.lastName}`;
+            document.getElementById('payStudentInfo').textContent = `Grade ${s.grade} • ${s.subject} • ${selectedMonth}`;
+            document.getElementById('payAmount').value = '';
+            document.getElementById('payNotes').value = '';
+            document.getElementById('payDate').value = new Date().toISOString().slice(0, 10);
+            document.getElementById('payModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closePayModal = function () {
+            document.getElementById('payModal').classList.remove('open');
+            document.body.style.overflow = '';
+        };
+
+        window.savePay = async function () {
+            const studentId = document.getElementById('payStudentId').value;
+            const month = document.getElementById('payMonth').value;
+            const amount = document.getElementById('payAmount').value;
+            const paidDate = document.getElementById('payDate').value;
+            const notes = document.getElementById('payNotes').value.trim();
+
+            if (!amount) { showToast('Please enter the amount paid.', 'error'); return; }
+
+            try {
+                const existing = paymentMap[studentId];
+                const data = { studentId, month, paid: true, amount: Number(amount), paidDate, notes, updatedAt: serverTimestamp() };
+
+                if (existing) {
+                    await updateDoc(doc(db, 'payments', existing.id), data);
+                } else {
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'payments'), data);
+                }
+
+                closePayModal();
+                showToast('Payment recorded successfully!', 'success');
+                await loadAll();
+            } catch (err) {
+                console.error(err);
+                showToast('Error saving payment.', 'error');
+            }
+        };
+
+        // ── Unmark paid ───────────────────────────────────────────────
+        window.unmarkPaid = async function (studentId) {
+            const s = allStudents.find(x => x.id === studentId);
+            const ok = await confirmAction(`Mark <strong>${s?.firstName} ${s?.lastName}</strong>'s payment as UNPAID for ${selectedMonth}?`);
+            if (!ok) return;
+
+            try {
+                const pay = paymentMap[studentId];
+                if (pay) {
+                    await updateDoc(doc(db, 'payments', pay.id), { paid: false, amount: 0, paidDate: '', updatedAt: serverTimestamp() });
+                }
+                showToast('Payment removed.', 'info');
+                await loadAll();
+            } catch (err) {
+                console.error(err);
+                showToast('Error updating payment.', 'error');
+            }
+        };
+
+        // ── Mark all paid / unpaid ───────────────────────────────────
+        window.markAllPaid = async function () {
+            const visible = applyFiltersRaw();
+            const unpaid = visible.filter(s => !paymentMap[s.id]?.paid);
+            if (unpaid.length === 0) { showToast('All visible students are already paid.', 'info'); return; }
+
+            const ok = await confirmAction(`Mark all <strong>${unpaid.length}</strong> unpaid students as PAID with amount Rs. ?<br><small>You can edit individual amounts afterwards.</small>`);
+            if (!ok) return;
+
+            const amtStr = prompt('Enter default amount for all (Rs.):');
+            if (!amtStr) return;
+
+            try {
+                await Promise.all(unpaid.map(s => {
+                    const data = {
+                        studentId: s.id, month: selectedMonth, paid: true,
+                        amount: Number(amtStr), paidDate: new Date().toISOString().slice(0, 10),
+                        notes: 'Bulk marked', createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+                    };
+                    return addDoc(collection(db, 'payments'), data);
+                }));
+                showToast(`Marked ${unpaid.length} students as paid.`, 'success');
+                await loadAll();
+            } catch (err) {
+                showToast('Error marking payments.', 'error');
+            }
+        };
+
+        window.markAllUnpaid = async function () {
+            const ok = await confirmAction('Remove ALL payments for this month? This cannot be undone.');
+            if (!ok) return;
+            try {
+                const snap = await getDocs(query(collection(db, 'payments'), where('month', '==', selectedMonth)));
+                await Promise.all(snap.docs.map(d => updateDoc(d.ref, { paid: false, amount: 0, paidDate: '', updatedAt: serverTimestamp() })));
+                showToast('All payments removed for this month.', 'info');
+                await loadAll();
+            } catch (err) {
+                showToast('Error.', 'error');
+            }
+        };
+
+        function applyFiltersRaw() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value;
+            const subject = document.getElementById('filterSubject').value;
+            const grade = document.getElementById('filterGrade').value;
+            return allStudents.filter(s => {
+                const isPaid = paymentMap[s.id]?.paid;
+                return (!search || `${s.firstName} ${s.lastName}`.toLowerCase().includes(search))
+                    && (!status || (status === 'paid' ? isPaid : !isPaid))
+                    && (!subject || s.subject === subject || s.subject === 'Both')
+                    && (!grade || String(s.grade) === grade);
+            });
+        }
+
+        // ── Init ─────────────────────────────────────────────────────
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        mobileBtn?.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('open'); });
+        overlay?.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('open'); });
+
+        populateMonthSelector();
+        loadAll();
+    </script>
+</body>
+
+</html>

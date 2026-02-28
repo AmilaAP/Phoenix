@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students – Phonex Institute</title>
+    <meta name="description" content="Manage all student records for Phonex Institute.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">
+                    <h2>Phonex</h2>
+                    <p>Institute System</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="../index.html" class="nav-link">
+                    <div class="nav-icon">📊</div> Dashboard
+                </a>
+                <a href="students.html" class="nav-link active">
+                    <div class="nav-icon">👨‍🎓</div> Students
+                </a>
+                <a href="attendance.html" class="nav-link">
+                    <div class="nav-icon">📋</div> Attendance
+                </a>
+                <a href="payments.html" class="nav-link">
+                    <div class="nav-icon">💳</div> Payments
+                </a>
+                <div class="nav-section-title" style="margin-top:8px">Scanner</div>
+                <a href="scanner.html" class="nav-link">
+                    <div class="nav-icon">📷</div> QR Scanner
+                </a>
+                <a href="qr-codes.html" class="nav-link">
+                    <div class="nav-icon">🔲</div> QR Codes
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar">A</div>
+                    <div>
+                        <div style="font-size:13px;font-weight:600">Admin</div>
+                        <div style="font-size:11px;color:var(--text-muted)">Institute Manager</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <div class="topbar-left">
+                        <h1>Students</h1>
+                        <p>Manage all student records</p>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="btn btn-primary" id="addStudentBtn">+ Add Student</button>
+                </div>
+            </div>
+
+            <div class="page-content">
+
+                <!-- Filters -->
+                <div class="filters-bar">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search by name, school…">
+                    </div>
+                    <select class="form-control" id="filterSubject" style="width:auto;min-width:130px">
+                        <option value="">All Subjects</option>
+                        <option value="Science">Science</option>
+                        <option value="Maths">Maths</option>
+                        <option value="Both">Both</option>
+                    </select>
+                    <select class="form-control" id="filterGrade" style="width:auto;min-width:120px">
+                        <option value="">All Grades</option>
+                        <option value="6">Grade 6</option>
+                        <option value="7">Grade 7</option>
+                        <option value="8">Grade 8</option>
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option>
+                    </select>
+                </div>
+
+                <!-- Student Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Student Records</div>
+                            <div class="card-subtitle" id="studentCount">Loading…</div>
+                        </div>
+                        <div id="bulkActions" style="display:none;gap:8px">
+                            <!-- future bulk actions -->
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>School</th>
+                                    <th>Subject</th>
+                                    <th>Grade</th>
+                                    <th>Birthdate</th>
+                                    <th>Parent</th>
+                                    <th>Contact</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="page-loading">
+                                            <div class="loading-spinner"></div> Loading students…
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Add / Edit Student Modal ── -->
+    <div class="modal-overlay" id="studentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">Add New Student</span>
+                <button class="modal-close" onclick="closeStudentModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editStudentId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name *</label>
+                        <input type="text" class="form-control" id="firstName" placeholder="Kamal">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name *</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="Perera">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">School</label>
+                    <input type="text" class="form-control" id="school" placeholder="Royal College">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Subject *</label>
+                        <select class="form-control" id="subject">
+                            <option value="">Select Subject</option>
+                            <option value="Science">Science</option>
+                            <option value="Maths">Maths</option>
+                            <option value="Both">Both (Science & Maths)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Grade *</label>
+                        <select class="form-control" id="grade">
+                            <option value="">Select Grade</option>
+                            <option value="6">Grade 6</option>
+                            <option value="7">Grade 7</option>
+                            <option value="8">Grade 8</option>
+                            <option value="9">Grade 9</option>
+                            <option value="10">Grade 10</option>
+                            <option value="11">Grade 11</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Birthdate</label>
+                    <input type="date" class="form-control" id="birthdate">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Parent / Guardian Name</label>
+                        <input type="text" class="form-control" id="parentName" placeholder="Mrs. Perera">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Parent Contact Number</label>
+                        <input type="tel" class="form-control" id="parentContact" placeholder="0712345678">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea class="form-control" id="notes" rows="2" placeholder="Any additional notes…"
+                        style="resize:vertical"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeStudentModal()">Cancel</button>
+                <button class="btn btn-primary" id="saveStudentBtn" onclick="saveStudent()">
+                    <span id="saveBtnText">Add Student</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import {
+            getFirestore, collection, addDoc, updateDoc, deleteDoc,
+            doc, getDocs, query, orderBy, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { firebaseConfig } from "../js/firebase-config.js";
+        import { showToast, confirmAction, initials, formatDate } from "../js/app.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allStudents = [];
+
+        // ── Load students ────────────────────────────────────────────
+        async function loadStudents() {
+            const tbody = document.getElementById('studentsTableBody');
+            try {
+                const snap = await getDocs(query(collection(db, 'students'), orderBy('createdAt', 'desc')));
+                allStudents = [];
+                snap.forEach(d => allStudents.push({ id: d.id, ...d.data() }));
+                renderTable(allStudents);
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">
+      <div class="empty-icon">⚠️</div>
+      <h3>Firebase not configured</h3>
+      <p>Please fill in your Firebase credentials in <code>js/firebase-config.js</code></p>
+    </div></td></tr>`;
+            }
+        }
+
+        // ── Render table ─────────────────────────────────────────────
+        function renderTable(students) {
+            const tbody = document.getElementById('studentsTableBody');
+            document.getElementById('studentCount').textContent =
+                `${students.length} student${students.length !== 1 ? 's' : ''}`;
+
+            if (students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">
+      <div class="empty-icon">👨‍🎓</div>
+      <h3>No Students Found</h3>
+      <p>Add your first student using the button above.</p>
+    </div></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = students.map(s => {
+                const subjectClass = s.subject?.toLowerCase() === 'maths' ? 'maths' :
+                    s.subject?.toLowerCase() === 'science' ? 'science' : 'maths';
+                const subjectLabel = s.subject || '—';
+                return `<tr>
+      <td>
+        <div class="name-cell">
+          <div class="student-avatar">${initials(s.firstName, s.lastName)}</div>
+          <div>
+            <div class="student-name">${s.firstName} ${s.lastName}</div>
+            <div class="student-id">ID: ${s.id.slice(0, 8).toUpperCase()}</div>
+          </div>
+        </div>
+      </td>
+      <td>${s.school || '—'}</td>
+      <td><span class="subject-pill ${subjectClass}">${subjectLabel}</span></td>
+      <td><span class="grade-pill">Grade ${s.grade || '—'}</span></td>
+      <td>${formatDate(s.birthdate)}</td>
+      <td>${s.parentName || '—'}</td>
+      <td>${s.parentContact || '—'}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm btn-icon" title="Edit" onclick="editStudent('${s.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" title="Delete" onclick="deleteStudent('${s.id}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+            }).join('');
+        }
+
+        // ── Filter & search ──────────────────────────────────────────
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase().trim();
+            const subject = document.getElementById('filterSubject').value;
+            const grade = document.getElementById('filterGrade').value;
+
+            const filtered = allStudents.filter(s => {
+                const matchSearch = !search ||
+                    `${s.firstName} ${s.lastName} ${s.school}`.toLowerCase().includes(search);
+                const matchSubject = !subject || s.subject === subject || s.subject === 'Both';
+                const matchGrade = !grade || String(s.grade) === grade;
+                return matchSearch && matchSubject && matchGrade;
+            });
+
+            renderTable(filtered);
+        }
+
+        ['searchInput', 'filterSubject', 'filterGrade'].forEach(id =>
+            document.getElementById(id)?.addEventListener('input', applyFilters)
+        );
+
+        // ── Modal ────────────────────────────────────────────────────
+        window.closeStudentModal = function () {
+            document.getElementById('studentModal').classList.remove('open');
+            document.body.style.overflow = '';
+            clearForm();
+        };
+
+        function clearForm() {
+            ['editStudentId', 'firstName', 'lastName', 'school', 'subject', 'grade',
+                'birthdate', 'parentName', 'parentContact', 'notes'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+            document.getElementById('modalTitle').textContent = 'Add New Student';
+            document.getElementById('saveBtnText').textContent = 'Add Student';
+        }
+
+        document.getElementById('addStudentBtn')?.addEventListener('click', () => {
+            clearForm();
+            document.getElementById('studentModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // ── Edit ─────────────────────────────────────────────────────
+        window.editStudent = function (id) {
+            const s = allStudents.find(x => x.id === id);
+            if (!s) return;
+            document.getElementById('editStudentId').value = id;
+            document.getElementById('firstName').value = s.firstName || '';
+            document.getElementById('lastName').value = s.lastName || '';
+            document.getElementById('school').value = s.school || '';
+            document.getElementById('subject').value = s.subject || '';
+            document.getElementById('grade').value = s.grade || '';
+            document.getElementById('birthdate').value = s.birthdate || '';
+            document.getElementById('parentName').value = s.parentName || '';
+            document.getElementById('parentContact').value = s.parentContact || '';
+            document.getElementById('notes').value = s.notes || '';
+            document.getElementById('modalTitle').textContent = 'Edit Student';
+            document.getElementById('saveBtnText').textContent = 'Save Changes';
+            document.getElementById('studentModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        // ── Save ─────────────────────────────────────────────────────
+        window.saveStudent = async function () {
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const school = document.getElementById('school').value.trim();
+            const subject = document.getElementById('subject').value;
+            const grade = document.getElementById('grade').value;
+            const birthdate = document.getElementById('birthdate').value;
+            const parentName = document.getElementById('parentName').value.trim();
+            const parentContact = document.getElementById('parentContact').value.trim();
+            const notes = document.getElementById('notes').value.trim();
+            const editId = document.getElementById('editStudentId').value;
+
+            if (!firstName || !lastName) { showToast('First and last name are required.', 'error'); return; }
+            if (!subject) { showToast('Please select a subject.', 'error'); return; }
+            if (!grade) { showToast('Please select a grade.', 'error'); return; }
+
+            const btn = document.getElementById('saveStudentBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner"></div>';
+
+            const data = { firstName, lastName, school, subject, grade, birthdate, parentName, parentContact, notes };
+
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, 'students', editId), data);
+                    showToast(`${firstName} ${lastName} updated successfully.`, 'success');
+                } else {
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'students'), data);
+                    showToast(`${firstName} ${lastName} added successfully.`, 'success');
+                }
+                closeStudentModal();
+                loadStudents();
+            } catch (err) {
+                console.error(err);
+                showToast('Error saving student. Check Firebase config.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span id="saveBtnText">' + (editId ? 'Save Changes' : 'Add Student') + '</span>';
+            }
+        };
+
+        // ── Delete ───────────────────────────────────────────────────
+        window.deleteStudent = async function (id) {
+            const s = allStudents.find(x => x.id === id);
+            const confirmed = await confirmAction(
+                `Are you sure you want to delete <strong>${s?.firstName} ${s?.lastName}</strong>? This will also remove their attendance and payment records.`
+            );
+            if (!confirmed) return;
+
+            try {
+                await deleteDoc(doc(db, 'students', id));
+                showToast('Student deleted.', 'success');
+                loadStudents();
+            } catch (err) {
+                console.error(err);
+                showToast('Error deleting student.', 'error');
+            }
+        };
+
+        // ── Init ─────────────────────────────────────────────────────
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        mobileBtn?.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('open'); });
+        overlay?.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('open'); });
+
+        loadStudents();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance – Phonex Institute</title>
+    <meta name="description" content="View and manage student attendance records at Phonex Institute.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">
+                    <h2>Phonex</h2>
+                    <p>Institute System</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <a href="../index.html" class="nav-link">
+                    <div class="nav-icon">📊</div> Dashboard
+                </a>
+                <a href="students.html" class="nav-link">
+                    <div class="nav-icon">👨‍🎓</div> Students
+                </a>
+                <a href="attendance.html" class="nav-link active">
+                    <div class="nav-icon">📋</div> Attendance
+                </a>
+                <a href="payments.html" class="nav-link">
+                    <div class="nav-icon">💳</div> Payments
+                </a>
+                <div class="nav-section-title" style="margin-top:8px">Scanner</div>
+                <a href="scanner.html" class="nav-link">
+                    <div class="nav-icon">📷</div> QR Scanner
+                </a>
+                <a href="qr-codes.html" class="nav-link">
+                    <div class="nav-icon">🔲</div> QR Codes
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar">A</div>
+                    <div>
+                        <div style="font-size:13px;font-weight:600">Admin</div>
+                        <div style="font-size:11px;color:var(--text-muted)">Institute Manager</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                    <div class="topbar-left">
+                        <h1>Attendance</h1>
+                        <p>Track student presence by date</p>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <a href="scanner.html" class="btn btn-primary btn-sm">📷 Open Scanner</a>
+                </div>
+            </div>
+
+            <div class="page-content">
+
+                <!-- Date + Filters -->
+                <div class="filters-bar">
+                    <div class="form-group" style="margin:0">
+                        <input type="date" class="form-control" id="dateFilter" style="width:auto">
+                    </div>
+                    <div class="search-input-wrapper" style="max-width:260px">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search student…">
+                    </div>
+                    <select class="form-control" id="filterSubject" style="width:auto;min-width:130px">
+                        <option value="">All Subjects</option>
+                        <option value="Science">Science</option>
+                        <option value="Maths">Maths</option>
+                    </select>
+                    <select class="form-control" id="filterGrade" style="width:auto;min-width:120px">
+                        <option value="">All Grades</option>
+                        <option value="6">Grade 6</option>
+                        <option value="7">Grade 7</option>
+                        <option value="8">Grade 8</option>
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option>
+                    </select>
+                </div>
+
+                <!-- Summary Stats for selected date -->
+                <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px" id="attStats">
+                    <div class="stat-card">
+                        <div class="stat-icon green">✅</div>
+                        <div class="stat-info">
+                            <h3 id="statPresent">–</h3>
+                            <p>Present</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">❌</div>
+                        <div class="stat-info">
+                            <h3 id="statAbsent">–</h3>
+                            <p>Absent</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">📊</div>
+                        <div class="stat-info">
+                            <h3 id="statRate">–</h3>
+                            <p>Attendance Rate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">📋 Attendance Records</div>
+                            <div class="card-subtitle" id="attSubtitle">Select a date to view records</div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Student</th>
+                                    <th>Grade</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                    <th>Scan Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attTableBody">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="page-loading">
+                                            <div class="loading-spinner"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import {
+            getFirestore, collection, getDocs, query, where, orderBy
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { firebaseConfig } from "../js/firebase-config.js";
+        import { initials, formatTime } from "../js/app.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allStudents = [];
+        let currentAtt = [];
+
+        // Set today's date as default
+        const todayKey = new Date().toISOString().slice(0, 10);
+        document.getElementById('dateFilter').value = todayKey;
+
+        // ── Load all students (for absent calculation) ────────────────
+        async function loadStudents() {
+            const snap = await getDocs(collection(db, 'students'));
+            allStudents = [];
+            snap.forEach(d => allStudents.push({ id: d.id, ...d.data() }));
+        }
+
+        // ── Load attendance for selected date ────────────────────────
+        async function loadAttendance() {
+            const date = document.getElementById('dateFilter').value || todayKey;
+            const tbody = document.getElementById('attTableBody');
+            tbody.innerHTML = `<tr><td colspan="6"><div class="page-loading"><div class="loading-spinner"></div></div></td></tr>`;
+
+            try {
+                const snap = await getDocs(query(
+                    collection(db, 'attendance'),
+                    where('date', '==', date)
+                ));
+
+                currentAtt = [];
+                snap.forEach(d => currentAtt.push({ id: d.id, ...d.data() }));
+
+                applyFilters();
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+      <div class="empty-icon">⚠️</div><h3>Error</h3><p>${err.message}</p>
+    </div></td></tr>`;
+            }
+        }
+
+        // ── Render table ─────────────────────────────────────────────
+        function renderTable(attRecords) {
+            const tbody = document.getElementById('attTableBody');
+            const date = document.getElementById('dateFilter').value || todayKey;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const subject = document.getElementById('filterSubject').value;
+            const grade = document.getElementById('filterGrade').value;
+
+            // Build a set of present student IDs
+            const presentIds = new Set(attRecords.map(r => r.studentId));
+
+            // All students that match filters
+            const filteredStudents = allStudents.filter(s => {
+                const matchSearch = !search || `${s.firstName} ${s.lastName}`.toLowerCase().includes(search);
+                const matchSubject = !subject || s.subject === subject || s.subject === 'Both';
+                const matchGrade = !grade || String(s.grade) === grade;
+                return matchSearch && matchSubject && matchGrade;
+            });
+
+            const present = filteredStudents.filter(s => presentIds.has(s.id));
+            const absent = filteredStudents.filter(s => !presentIds.has(s.id));
+            const total = filteredStudents.length;
+            const rate = total > 0 ? Math.round((present.length / total) * 100) : 0;
+
+            document.getElementById('statPresent').textContent = present.length;
+            document.getElementById('statAbsent').textContent = absent.length;
+            document.getElementById('statRate').textContent = `${rate}%`;
+
+            const dateStr = new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('attSubtitle').textContent =
+                `${present.length} of ${total} students present on ${dateStr}`;
+
+            if (total === 0) {
+                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3>No Students Match Filters</h3>
+    </div></td></tr>`;
+                return;
+            }
+
+            // Build rows: present first, then absent
+            const attMap = {};
+            attRecords.forEach(r => attMap[r.studentId] = r);
+
+            const rows = [...present, ...absent].map((s, i) => {
+                const isPresent = presentIds.has(s.id);
+                const rec = attMap[s.id];
+                const time = rec ? formatTime(rec.scannedAt?.toDate?.() || rec.scannedAt) : '—';
+                const ini = initials(s.firstName, s.lastName);
+                const subjectClass = s.subject?.toLowerCase() === 'maths' ? 'maths' : 'science';
+
+                return `<tr>
+      <td style="color:var(--text-muted)">${i + 1}</td>
+      <td>
+        <div class="name-cell">
+          <div class="student-avatar" style="${isPresent ? '' : 'opacity:0.5;filter:grayscale(1)'}">${ini}</div>
+          <div>
+            <div class="student-name">${s.firstName} ${s.lastName}</div>
+            <div class="student-id">${s.school || ''}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="grade-pill">Grade ${s.grade}</span></td>
+      <td><span class="subject-pill ${subjectClass}">${s.subject}</span></td>
+      <td>${isPresent
+                        ? '<span class="badge badge-success">✅ Present</span>'
+                        : '<span class="badge badge-danger">❌ Absent</span>'
+                    }</td>
+      <td style="color:var(--text-muted)">${time}</td>
+    </tr>`;
+            });
+
+            tbody.innerHTML = rows.join('');
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const subject = document.getElementById('filterSubject').value;
+            const grade = document.getElementById('filterGrade').value;
+
+            const filtered = currentAtt.filter(r => {
+                const matchSearch = !search || (r.studentName || '').toLowerCase().includes(search);
+                const matchSubject = !subject || r.subject === subject || r.subject === 'Both';
+                const matchGrade = !grade || String(r.grade) === grade;
+                return matchSearch && matchSubject && matchGrade;
+            });
+
+            renderTable(currentAtt);
+        }
+
+        // ── Events ───────────────────────────────────────────────────
+        document.getElementById('dateFilter').addEventListener('change', loadAttendance);
+        ['searchInput', 'filterSubject', 'filterGrade'].forEach(id =>
+            document.getElementById(id)?.addEventListener('input', applyFilters)
+        );
+
+        // ── Init ─────────────────────────────────────────────────────
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        mobileBtn?.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('open'); });
+        overlay?.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('open'); });
+
+        await loadStudents();
+        await loadAttendance();
+    </script>
+</body>
+
+</html>
