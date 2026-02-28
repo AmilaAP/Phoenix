@@ -7,6 +7,18 @@
     <title>QR Scanner – Phoenix Institute</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <!-- Sidebar helpers — plain script so onclick="toggleSidebar()" always
+         works on GitHub Pages regardless of module loading state. -->
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar')?.classList.toggle('-translate-x-full');
+            document.getElementById('overlay')?.classList.toggle('hidden');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar')?.classList.add('-translate-x-full');
+            document.getElementById('overlay')?.classList.add('hidden');
+        }
+    </script>
 </head>
 
 <body class="bg-gray-950 text-gray-100 antialiased font-sans">

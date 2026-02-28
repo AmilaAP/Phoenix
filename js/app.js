@@ -13,7 +13,7 @@ _style.textContent = `
 `;
 document.head.appendChild(_style);
 
-// ── Sidebar ──────────────────────────────────────────────────────────
+// ── Sidebar — also set on window so inline onclick="" always works ────
 export function toggleSidebar() {
     document.getElementById('sidebar')?.classList.toggle('-translate-x-full');
     document.getElementById('overlay')?.classList.toggle('hidden');
@@ -22,6 +22,8 @@ export function closeSidebar() {
     document.getElementById('sidebar')?.classList.add('-translate-x-full');
     document.getElementById('overlay')?.classList.add('hidden');
 }
+// Ensure global availability immediately (modules are deferred, this
+// re-assigns after the module executes so onclick="" handlers always find them)
 window.toggleSidebar = toggleSidebar;
 window.closeSidebar = closeSidebar;
 

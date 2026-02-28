@@ -8,6 +8,19 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+  <!-- Sidebar helpers as plain script — must load before any module so
+       onclick="toggleSidebar()" works on GitHub Pages without depending
+       on the ES module finishing first. -->
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar')?.classList.toggle('-translate-x-full');
+      document.getElementById('overlay')?.classList.toggle('hidden');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar')?.classList.add('-translate-x-full');
+      document.getElementById('overlay')?.classList.add('hidden');
+    }
+  </script>
 </head>
 
 <body class="bg-gray-950 text-gray-100 antialiased font-sans">
@@ -264,8 +277,15 @@
       </div>`;
 
       } catch (err) {
-        console.error(err);
-        document.getElementById('attList').innerHTML = `<div class="text-center py-6 text-red-400 text-xs">⚠️ ${err.message}</div>`;
+        console.error('Firebase load error:', err);
+        const msg = `<div class="text-center py-6 text-red-400 text-xs">⚠️ ${err.message}</div>`;
+        const errSmall = `<span class="text-red-400 text-xs">Err</span>`;
+        document.getElementById('attList').innerHTML = msg;
+        document.getElementById('breakdown').innerHTML = msg;
+        document.getElementById('s1').innerHTML = errSmall;
+        document.getElementById('s2').innerHTML = errSmall;
+        document.getElementById('s3').innerHTML = errSmall;
+        document.getElementById('s4').innerHTML = errSmall;
       }
     }
     load();
