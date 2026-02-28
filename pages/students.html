@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Students – Phoenix Institute</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Sidebar helpers — plain script so onclick="toggleSidebar()" always
-         works on GitHub Pages regardless of module loading state. -->
+    <!-- Auth + sidebar helpers — plain script so always available -->
     <script>
+        (function () { if (!localStorage.getItem('phoenixAuth')) location.replace('../login.html'); })();
         function toggleSidebar() {
             document.getElementById('sidebar')?.classList.toggle('-translate-x-full');
             document.getElementById('overlay')?.classList.toggle('hidden');
@@ -16,6 +16,12 @@
         function closeSidebar() {
             document.getElementById('sidebar')?.classList.add('-translate-x-full');
             document.getElementById('overlay')?.classList.add('hidden');
+        }
+        function logout() {
+            localStorage.removeItem('phoenixAuth');
+            localStorage.removeItem('phoenixRole');
+            localStorage.removeItem('phoenixUser');
+            location.replace('../login.html');
         }
     </script>
 </head>
@@ -60,14 +66,16 @@
                         class="text-lg w-7 text-center">🔲</span>QR Codes</a>
             </nav>
             <div class="p-4 border-t border-gray-800">
-                <div class="flex items-center gap-3 px-2">
+                <div class="flex items-center gap-2 px-2">
                     <div
                         class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold shrink-0">
                         A</div>
-                    <div>
+                    <div class="flex-1 min-w-0">
                         <div class="text-xs font-semibold text-white">Admin</div>
                         <div class="text-[10px] text-gray-500">Institute Manager</div>
                     </div>
+                    <button onclick="logout()" title="Sign out"
+                        class="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-red-500/20 hover:text-red-400 text-gray-500 transition-colors text-sm shrink-0">↩</button>
                 </div>
             </div>
         </aside>
@@ -118,6 +126,8 @@
                         <option value="">All Subjects</option>
                         <option>Science</option>
                         <option>Maths</option>
+                        <option>Tamil</option>
+                        <option>English</option>
                     </select>
                     <select id="fGrade" onchange="filter()"
                         class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-indigo-500 transition-colors">
@@ -252,20 +262,32 @@
                 <div>
                     <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Subjects
                         Enrolled *</label>
-                    <div class="flex gap-3">
+                    <div class="grid grid-cols-2 gap-2">
                         <label
-                            class="flex items-center gap-2 flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 cursor-pointer hover:border-emerald-500/50 transition-colors has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-500/10">
+                            class="flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 cursor-pointer hover:border-emerald-500/50 transition-colors has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-500/10">
                             <input type="checkbox" id="chkSci" value="Science"
                                 class="w-4 h-4 rounded accent-emerald-500">
                             <span class="text-sm font-medium text-gray-300">🔬 Science</span>
                         </label>
                         <label
-                            class="flex items-center gap-2 flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 cursor-pointer hover:border-amber-500/50 transition-colors has-[:checked]:border-amber-500 has-[:checked]:bg-amber-500/10">
+                            class="flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 cursor-pointer hover:border-amber-500/50 transition-colors has-[:checked]:border-amber-500 has-[:checked]:bg-amber-500/10">
                             <input type="checkbox" id="chkMath" value="Maths" class="w-4 h-4 rounded accent-amber-500">
                             <span class="text-sm font-medium text-gray-300">📐 Maths</span>
                         </label>
+                        <label
+                            class="flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 cursor-pointer hover:border-sky-500/50 transition-colors has-[:checked]:border-sky-500 has-[:checked]:bg-sky-500/10">
+                            <input type="checkbox" id="chkTamil" value="Tamil" class="w-4 h-4 rounded accent-sky-500">
+                            <span class="text-sm font-medium text-gray-300">📖 Tamil</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 cursor-pointer hover:border-violet-500/50 transition-colors has-[:checked]:border-violet-500 has-[:checked]:bg-violet-500/10">
+                            <input type="checkbox" id="chkEnglish" value="English"
+                                class="w-4 h-4 rounded accent-violet-500">
+                            <span class="text-sm font-medium text-gray-300">📝 English</span>
+                        </label>
                     </div>
-                    <p class="text-[11px] text-gray-600 mt-1.5">💡 Can enroll in both. Payment is tracked per subject.
+                    <p class="text-[11px] text-gray-600 mt-1.5">💡 Can enroll in multiple subjects. Payment is tracked
+                        per subject.
                     </p>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -302,13 +324,11 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, serverTimestamp }
+        import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, serverTimestamp }
             from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { firebaseConfig } from "../js/firebase-config.js";
+        import { db } from "../js/firebase-config.js";
         import { showToast, confirmAction, initials, formatDate, getSubjects, openModal, closeModal } from "../js/app.js";
 
-        const db = getFirestore(initializeApp(firebaseConfig));
         let all = [];
 
         async function load() {
@@ -332,10 +352,13 @@
             tb.innerHTML = list.map(s => {
                 const subs = getSubjects(s);
                 const ini = initials(s.firstName, s.lastName);
-                const subBadges = subs.map(sub => sub === 'Science'
-                    ? '<span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-[11px] font-medium border border-emerald-500/20">🔬 Science</span>'
-                    : '<span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-400 text-[11px] font-medium border border-amber-500/20">📐 Maths</span>'
-                ).join('<span class="mx-0.5"></span>');
+                const SUB_BADGE = {
+                    Science: '<span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-[11px] font-medium border border-emerald-500/20">🔬 Science</span>',
+                    Maths: '<span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-400 text-[11px] font-medium border border-amber-500/20">📐 Maths</span>',
+                    Tamil: '<span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-sky-500/10 text-sky-400 text-[11px] font-medium border border-sky-500/20">📖 Tamil</span>',
+                    English: '<span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-violet-500/10 text-violet-400 text-[11px] font-medium border border-violet-500/20">📝 English</span>',
+                };
+                const subBadges = subs.map(sub => SUB_BADGE[sub] || `<span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-gray-700 text-gray-300 text-[11px] font-medium">${sub}</span>`).join('<span class="mx-0.5"></span>');
                 return `<tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
       <td class="px-4 py-3">
         <div class="flex items-center gap-3">
@@ -374,6 +397,8 @@
             ['editId', 'fn', 'ln', 'school', 'grade', 'bd', 'pn', 'pc', 'notes'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
             document.getElementById('chkSci').checked = false;
             document.getElementById('chkMath').checked = false;
+            document.getElementById('chkTamil').checked = false;
+            document.getElementById('chkEnglish').checked = false;
             document.getElementById('modalTitle').textContent = 'Add Student';
             document.getElementById('saveTxt').textContent = 'Add Student';
         }
@@ -398,6 +423,8 @@
             document.getElementById('notes').value = s.notes || '';
             document.getElementById('chkSci').checked = subs.includes('Science');
             document.getElementById('chkMath').checked = subs.includes('Maths');
+            document.getElementById('chkTamil').checked = subs.includes('Tamil');
+            document.getElementById('chkEnglish').checked = subs.includes('English');
             document.getElementById('modalTitle').textContent = 'Edit Student';
             document.getElementById('saveTxt').textContent = 'Save Changes';
             openModal('modal');
@@ -410,6 +437,8 @@
             const subjects = [];
             if (document.getElementById('chkSci').checked) subjects.push('Science');
             if (document.getElementById('chkMath').checked) subjects.push('Maths');
+            if (document.getElementById('chkTamil').checked) subjects.push('Tamil');
+            if (document.getElementById('chkEnglish').checked) subjects.push('English');
             const editId = document.getElementById('editId').value;
 
             if (!fn || !ln) { showToast('First and last name required', 'error'); return; }

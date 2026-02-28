@@ -112,6 +112,18 @@ export function getSubjects(student) {
     if (student.subject === 'Both') return ['Science', 'Maths'];
     if (student.subject === 'Science') return ['Science'];
     if (student.subject === 'Maths') return ['Maths'];
+    if (student.subject === 'Tamil') return ['Tamil'];
+    if (student.subject === 'English') return ['English'];
     return ['Science'];
 }
 window.getSubjects = getSubjects;
+
+// ── Subject style map — use for consistent badge colours everywhere ───
+export const subjectStyle = {
+    Science: { icon: '🔬', bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', accent: 'bg-emerald-500/20' },
+    Maths: { icon: '📐', bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/20', accent: 'bg-amber-500/20' },
+    Tamil: { icon: '📖', bg: 'bg-sky-500/10', text: 'text-sky-400', border: 'border-sky-500/20', accent: 'bg-sky-500/20' },
+    English: { icon: '📝', bg: 'bg-violet-500/10', text: 'text-violet-400', border: 'border-violet-500/20', accent: 'bg-violet-500/20' },
+};
+window.subjectStyle = subjectStyle;
+

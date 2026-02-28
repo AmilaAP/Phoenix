@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Payments – Phoenix Institute</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Sidebar helpers — plain script so onclick="toggleSidebar()" always
-         works on GitHub Pages regardless of module loading state. -->
+    <!-- Auth + sidebar helpers — plain script so always available -->
     <script>
+        (function () { if (!localStorage.getItem('phoenixAuth')) location.replace('../login.html'); })();
         function toggleSidebar() {
             document.getElementById('sidebar')?.classList.toggle('-translate-x-full');
             document.getElementById('overlay')?.classList.toggle('hidden');
@@ -16,6 +16,12 @@
         function closeSidebar() {
             document.getElementById('sidebar')?.classList.add('-translate-x-full');
             document.getElementById('overlay')?.classList.add('hidden');
+        }
+        function logout() {
+            localStorage.removeItem('phoenixAuth');
+            localStorage.removeItem('phoenixRole');
+            localStorage.removeItem('phoenixUser');
+            location.replace('../login.html');
         }
     </script>
 </head>
@@ -60,14 +66,16 @@
                         class="text-lg w-7 text-center">🔲</span>QR Codes</a>
             </nav>
             <div class="p-4 border-t border-gray-800">
-                <div class="flex items-center gap-3 px-2">
+                <div class="flex items-center gap-2 px-2">
                     <div
                         class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold shrink-0">
                         A</div>
-                    <div>
+                    <div class="flex-1 min-w-0">
                         <div class="text-xs font-semibold text-white">Admin</div>
                         <div class="text-[10px] text-gray-500">Institute Manager</div>
                     </div>
+                    <button onclick="logout()" title="Sign out"
+                        class="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-red-500/20 hover:text-red-400 text-gray-500 transition-colors text-sm shrink-0">↩</button>
                 </div>
             </div>
         </aside>
@@ -75,7 +83,6 @@
         <!-- Main -->
         <div class="flex-1 flex flex-col min-h-screen lg:overflow-y-auto">
 
-            <!-- Mobile header -->
             <header
                 class="lg:hidden sticky top-0 z-30 bg-gray-900/95 backdrop-blur border-b border-gray-800 px-4 py-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -87,8 +94,18 @@
                     </button>
                     <span class="font-bold text-white">Payments</span>
                 </div>
-                <select id="monthSel2" onchange="syncMonth(this)"
-                    class="bg-gray-800 border border-gray-700 rounded-xl px-2 py-1.5 text-xs text-gray-300 focus:outline-none"></select>
+                <div class="flex items-center gap-2">
+                    <select id="subSel2" onchange="syncSubject(this)"
+                        class="bg-gray-800 border border-gray-700 rounded-xl px-2 py-1.5 text-xs text-gray-300 focus:outline-none">
+                        <option value="">All Sub.</option>
+                        <option value="Science">🔬 Sci</option>
+                        <option value="Maths">📐 Math</option>
+                        <option value="Tamil">📖 Tamil</option>
+                        <option value="English">📝 Eng</option>
+                    </select>
+                    <select id="monthSel2" onchange="syncMonth(this)"
+                        class="bg-gray-800 border border-gray-700 rounded-xl px-2 py-1.5 text-xs text-gray-300 focus:outline-none"></select>
+                </div>
             </header>
 
             <!-- Desktop header -->
@@ -98,8 +115,18 @@
                     <h1 class="text-xl font-bold text-white">Payments</h1>
                     <p class="text-sm text-gray-500">Monthly class fee tracking – per subject</p>
                 </div>
-                <select id="monthSel" onchange="syncMonth(this)"
-                    class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-indigo-500 transition-colors"></select>
+                <div class="flex items-center gap-3">
+                    <select id="subSel" onchange="syncSubject(this)"
+                        class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-indigo-500 transition-colors">
+                        <option value="">All Subjects</option>
+                        <option value="Science">🔬 Science</option>
+                        <option value="Maths">📐 Maths</option>
+                        <option value="Tamil">📖 Tamil</option>
+                        <option value="English">📝 English</option>
+                    </select>
+                    <select id="monthSel" onchange="syncMonth(this)"
+                        class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-indigo-500 transition-colors"></select>
+                </div>
             </header>
 
             <div class="flex-1 p-4 lg:p-8 pb-24 lg:pb-8 space-y-5">
@@ -163,6 +190,8 @@
                         <option value="">All Subjects</option>
                         <option>Science</option>
                         <option>Maths</option>
+                        <option>Tamil</option>
+                        <option>English</option>
                     </select>
                     <select id="fGrade" onchange="applyFilter()"
                         class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none">
@@ -286,14 +315,12 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, updateDoc, doc, getDocs, query, where, serverTimestamp }
+        import { collection, addDoc, updateDoc, doc, getDocs, query, where, serverTimestamp }
             from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { firebaseConfig } from "../js/firebase-config.js";
+        import { db } from "../js/firebase-config.js";
         import { showToast, confirmAction, initials, getSubjects, openModal, closeModal, currentMonthStr } from "../js/app.js";
 
-        const db = getFirestore(initializeApp(firebaseConfig));
-        let students = [], payMap = {}, selMonth = '';
+        let students = [], payMap = {}, selMonth = '', selSubject = '';
         // payMap key = `${studentId}_${subject}`
 
         // ── Month selector ───────────────────────────────────────────
@@ -315,6 +342,12 @@
             loadAll();
         };
 
+        window.syncSubject = function (el) {
+            selSubject = el.value;
+            ['subSel', 'subSel2'].forEach(id => { const e = document.getElementById(id); if (e) e.value = selSubject; });
+            applyFilter(); // no refetch needed — just refilter in-memory data
+        };
+
         async function loadAll() {
             const [ss, ps] = await Promise.all([
                 getDocs(collection(db, 'students')),
@@ -326,12 +359,14 @@
             applyFilter();
         }
 
-        // ── Build slots ───────────────────────────────────────────────
-        function buildSlots() {
+        // ── Build slots (optionally scoped to selected subject) ────────
+        function buildSlots(subjectFilter) {
             const slots = [];
+            const sub = subjectFilter !== undefined ? subjectFilter : selSubject;
             students.forEach(s => {
-                getSubjects(s).forEach(sub => {
-                    slots.push({ student: s, subject: sub, pay: payMap[`${s.id}_${sub}`] });
+                getSubjects(s).forEach(s_sub => {
+                    if (!sub || s_sub === sub)
+                        slots.push({ student: s, subject: s_sub, pay: payMap[`${s.id}_${s_sub}`] });
                 });
             });
             return slots;
@@ -340,24 +375,24 @@
         window.applyFilter = function () {
             const q = document.getElementById('q').value.toLowerCase();
             const fs = document.getElementById('fStatus').value;
-            const fsub = document.getElementById('fSub').value;
             const fg = document.getElementById('fGrade').value;
-            const slots = buildSlots().filter(({ student: s, subject, pay }) => {
+            // buildSlots() is already scoped to selSubject via header filter
+            const slots = buildSlots().filter(({ student: s, pay }) => {
                 const paid = !!pay?.paid;
                 return (!q || `${s.firstName} ${s.lastName}`.toLowerCase().includes(q))
                     && (!fs || (fs === 'paid' ? paid : !paid))
-                    && (!fsub || subject === fsub)
                     && (!fg || String(s.grade) === fg);
             });
             renderTable(slots);
         };
 
         function renderTable(slots) {
-            const totalAll = buildSlots();
-            const paidCount = totalAll.filter(x => x.pay?.paid).length;
-            const total = totalAll.length;
+            // Stats are always scoped to selSubject (header filter) — NOT the row-level filters
+            const statsSlots = buildSlots(); // already filtered by selSubject
+            const paidCount = statsSlots.filter(x => x.pay?.paid).length;
+            const total = statsSlots.length;
             const rate = total ? Math.round(paidCount / total * 100) : 0;
-            const amt = Object.values(payMap).reduce((s, p) => s + (p.paid ? Number(p.amount || 0) : 0), 0);
+            const amt = statsSlots.filter(x => x.pay?.paid).reduce((s, x) => s + Number(x.pay?.amount || 0), 0);
             document.getElementById('sPaid').textContent = paidCount;
             document.getElementById('sUnpaid').textContent = Math.max(0, total - paidCount);
             document.getElementById('sAmt').textContent = amt.toLocaleString();
@@ -376,8 +411,14 @@
             tb.innerHTML = slots.map(({ student: s, subject, pay }) => {
                 const paid = !!pay?.paid;
                 const ini = initials(s.firstName, s.lastName);
-                const subBg = subject === 'Science' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-                const subIcon = subject === 'Science' ? '🔬' : '📐';
+                const SUB_STYLES = {
+                    Science: { bg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', icon: '🔬' },
+                    Maths: { bg: 'bg-amber-500/10 text-amber-400 border-amber-500/20', icon: '📐' },
+                    Tamil: { bg: 'bg-sky-500/10 text-sky-400 border-sky-500/20', icon: '📖' },
+                    English: { bg: 'bg-violet-500/10 text-violet-400 border-violet-500/20', icon: '📝' },
+                };
+                const subBg = (SUB_STYLES[subject] || SUB_STYLES.Science).bg;
+                const subIcon = (SUB_STYLES[subject] || SUB_STYLES.Science).icon;
                 const datePaid = pay?.paidDate ? new Date(pay.paidDate + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : '—';
                 return `<tr class="border-b border-gray-800 hover:bg-gray-800/40 transition-colors">
       <td class="px-4 py-3">
