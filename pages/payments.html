@@ -51,6 +51,9 @@
                 <a href="payments.html"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 text-sm font-semibold"><span
                         class="text-lg w-7 text-center">💳</span>Payments</a>
+                <a href="tute-distribution.html"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
+                        class="text-lg w-7 text-center">📦</span>Tute Distribution</a>
                 <p class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider px-3 pt-4 pb-2">Scanner</p>
                 <a href="scanner.html"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white text-sm font-medium transition-colors"><span
@@ -390,8 +393,10 @@
             const q = document.getElementById('q').value.toLowerCase();
             const fs = document.getElementById('fStatus').value;
             const fg = document.getElementById('fGrade').value;
-            // buildSlots() is already scoped to selSubject via header filter
-            const slots = buildSlots().filter(({ student: s, pay }) => {
+            const fSubRow = document.getElementById('fSub').value; // row-level subject filter
+            // buildSlots is scoped by selSubject (header filter); row-level fSub narrows further
+            const effectiveSub = fSubRow || selSubject || '';
+            const slots = buildSlots(effectiveSub).filter(({ student: s, pay }) => {
                 const paid = !!pay?.paid;
                 return (!q || `${s.firstName} ${s.lastName}`.toLowerCase().includes(q))
                     && (!fs || (fs === 'paid' ? paid : !paid))
