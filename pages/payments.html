@@ -143,6 +143,14 @@
                     </select>
                     <select id="monthSel" onchange="syncMonth(this)"
                         class="bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-indigo-500 transition-colors"></select>
+                    <button onclick="openPaysheetModal()"
+                        class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-sm font-semibold transition-all shadow-lg shadow-indigo-500/20">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M12 3v12M8 11l4 4 4-4M5 18h14a1 1 0 001-1v-1H4v1a1 1 0 001 1z" />
+                        </svg>
+                        Generate Paysheet
+                    </button>
                 </div>
             </header>
 
@@ -289,6 +297,70 @@
         </div>
     </nav>
 
+    <!-- ── Paysheet Modal ───────────────────────────────────────────── -->
+    <div id="paysheetModal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="modal-enter bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md shadow-2xl">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+                <div>
+                    <h2 class="font-bold text-white text-base">📄 Generate Paysheet</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Download teacher paysheet as PDF</p>
+                </div>
+                <button onclick="closeModal('paysheetModal')"
+                    class="w-8 h-8 flex items-center justify-center rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-400 text-lg">✕</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <!-- Subject selector -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Subject
+                        *</label>
+                    <select id="psSubject"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                        <option value="">— Select a subject —</option>
+                        <option value="Science">🔬 Science</option>
+                        <option value="Maths">📐 Maths</option>
+                        <option value="Tamil">📖 Tamil</option>
+                        <option value="English">📝 English</option>
+                    </select>
+                </div>
+                <!-- Month selector -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Month
+                        *</label>
+                    <select id="psMonth"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition-colors"></select>
+                </div>
+                <!-- Teacher name -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Teacher
+                        Name</label>
+                    <input id="psTeacher" type="text" placeholder="Enter teacher's full name…"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors">
+                </div>
+                <!-- Commission info card -->
+                <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3 flex items-center gap-3">
+                    <span class="text-2xl">🏛️</span>
+                    <div>
+                        <div class="text-xs font-semibold text-indigo-300">20% Institute Commission</div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Commission is automatically deducted from total
+                            collected amount.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 px-6 py-4 border-t border-gray-800">
+                <button onclick="closeModal('paysheetModal')"
+                    class="flex-1 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium transition-colors">Cancel</button>
+                <button onclick="downloadPaysheet()"
+                    class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-sm font-semibold transition-all flex items-center justify-center gap-2">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 3v12M8 11l4 4 4-4M5 18h14" />
+                    </svg>
+                    Download PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Pay Modal -->
     <div id="payModal"
         class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -336,6 +408,213 @@
             from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { db } from "../js/firebase-config.js";
         import { showToast, confirmAction, initials, getSubjects, openModal, closeModal, currentMonthStr } from "../js/app.js";
+
+        // ── Paysheet ──────────────────────────────────────────────────
+        window.openPaysheetModal = function () {
+            // Populate month selector in modal
+            const now = new Date(); const opts = [];
+            for (let i = 0; i < 12; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const lbl = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                opts.push(`<option value="${val}">${lbl}</option>`);
+            }
+            const psMon = document.getElementById('psMonth');
+            if (psMon) psMon.innerHTML = opts.join('');
+            // Pre-select current selSubject / selMonth
+            const psSub = document.getElementById('psSubject');
+            if (psSub && selSubject) psSub.value = selSubject;
+            if (psMon && selMonth) psMon.value = selMonth;
+            openModal('paysheetModal');
+        };
+
+        window.downloadPaysheet = async function () {
+            const subject = document.getElementById('psSubject').value;
+            const month = document.getElementById('psMonth').value;
+            const teacher = document.getElementById('psTeacher').value.trim();
+            if (!subject) { showToast('Please select a subject', 'error'); return; }
+            if (!month) { showToast('Please select a month', 'error'); return; }
+
+            // Fetch payments for the selected month & subject
+            let sts = students;
+            // If students not loaded yet, re-fetch
+            if (!sts.length) {
+                const ss = await getDocs(collection(db, 'students'));
+                sts = []; ss.forEach(d => sts.push({ id: d.id, ...d.data() }));
+            }
+            const ps = await getDocs(query(collection(db, 'payments'), where('month', '==', month), where('subject', '==', subject)));
+            const paidRecs = {};
+            ps.forEach(d => { const x = d.data(); if (x.paid) paidRecs[x.studentId] = x; });
+
+            // Build rows: only students enrolled in this subject
+            const rows = [];
+            sts.forEach(s => {
+                if (getSubjects(s).includes(subject)) {
+                    rows.push({ student: s, pay: paidRecs[s.id] || null });
+                }
+            });
+            rows.sort((a, b) => (a.student.firstName || '').localeCompare(b.student.firstName || ''));
+
+            const totalCollected = rows.reduce((sum, r) => sum + (r.pay ? Number(r.pay.amount || 0) : 0), 0);
+            const commission = Math.round(totalCollected * 0.20);
+            const netPayout = totalCollected - commission;
+            const paidCount = rows.filter(r => r.pay).length;
+            const unpaidCount = rows.length - paidCount;
+
+            // Month label
+            const [yr, mo] = month.split('-');
+            const monthLabel = new Date(Number(yr), Number(mo) - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            const SUB_COLOR = { Science: '#10b981', Maths: '#f59e0b', Tamil: '#0ea5e9', English: '#8b5cf6' };
+            const subColor = SUB_COLOR[subject] || '#6366f1';
+
+            const tableRows = rows.map((r, i) => {
+                const s = r.student;
+                const paid = !!r.pay;
+                const amt = paid ? `Rs. ${Number(r.pay.amount || 0).toLocaleString()}` : '—';
+                const datePaid = r.pay?.paidDate ? new Date(r.pay.paidDate + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+                return `<tr style="background:${i % 2 === 0 ? '#f9fafb' : '#ffffff'}">
+                  <td style="padding:9px 12px;font-size:13px;color:#111827;border-bottom:1px solid #e5e7eb">${i + 1}</td>
+                  <td style="padding:9px 12px;font-size:13px;color:#111827;font-weight:500;border-bottom:1px solid #e5e7eb">${s.firstName} ${s.lastName}</td>
+                  <td style="padding:9px 12px;font-size:13px;color:#374151;border-bottom:1px solid #e5e7eb">Grade ${s.grade || '?'}</td>
+                  <td style="padding:9px 12px;font-size:13px;border-bottom:1px solid #e5e7eb"><span style="display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:600;background:${paid ? '#d1fae5' : '#fee2e2'};color:${paid ? '#065f46' : '#991b1b'}">${paid ? '✓ Paid' : '✗ Unpaid'}</span></td>
+                  <td style="padding:9px 12px;font-size:13px;color:#111827;font-weight:600;text-align:right;border-bottom:1px solid #e5e7eb">${amt}</td>
+                  <td style="padding:9px 12px;font-size:13px;color:#6b7280;border-bottom:1px solid #e5e7eb">${datePaid}</td>
+                </tr>`;
+            }).join('');
+
+            const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Paysheet – ${subject} – ${monthLabel}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:#fff;color:#111827;}
+  @media print{
+    @page{margin:15mm 18mm;size:A4 portrait;}
+    .no-print{display:none!important;}
+    body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+</style>
+</head>
+<body>
+<div style="max-width:780px;margin:0 auto;padding:32px 24px;">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:3px solid ${subColor}">
+    <div>
+      <div style="font-size:22px;font-weight:800;color:#111827;letter-spacing:-0.5px">Phoenix Education Institute</div>
+      <div style="font-size:13px;color:#6b7280;margin-top:3px">Teacher Payment Statement</div>
+    </div>
+    <div style="text-align:right">
+      <div style="display:inline-block;padding:4px 14px;background:${subColor}22;border:1.5px solid ${subColor}55;border-radius:99px;font-size:12px;font-weight:700;color:${subColor}">${subject}</div>
+      <div style="font-size:13px;color:#6b7280;margin-top:6px">${monthLabel}</div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:2px">Generated: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+    </div>
+  </div>
+
+  <!-- Teacher info -->
+  <div style="display:flex;gap:16px;margin-bottom:24px;">
+    <div style="flex:1;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;">
+      <div style="font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Teacher</div>
+      <div style="font-size:15px;font-weight:700;color:#111827">${teacher || '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}</div>
+    </div>
+    <div style="flex:1;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;">
+      <div style="font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Subject</div>
+      <div style="font-size:15px;font-weight:700;color:#111827">${subject}</div>
+    </div>
+    <div style="flex:1;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;">
+      <div style="font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Period</div>
+      <div style="font-size:15px;font-weight:700;color:#111827">${monthLabel}</div>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div style="display:flex;gap:12px;margin-bottom:24px;">
+    <div style="flex:1;border-radius:12px;padding:14px;background:#f0fdf4;border:1.5px solid #bbf7d0;text-align:center">
+      <div style="font-size:22px;font-weight:800;color:#15803d">${paidCount}</div>
+      <div style="font-size:11px;color:#166534;font-weight:600">Paid Students</div>
+    </div>
+    <div style="flex:1;border-radius:12px;padding:14px;background:#fef2f2;border:1.5px solid #fecaca;text-align:center">
+      <div style="font-size:22px;font-weight:800;color:#dc2626">${unpaidCount}</div>
+      <div style="font-size:11px;color:#991b1b;font-weight:600">Unpaid Students</div>
+    </div>
+    <div style="flex:1;border-radius:12px;padding:14px;background:#eff6ff;border:1.5px solid #bfdbfe;text-align:center">
+      <div style="font-size:22px;font-weight:800;color:#1d4ed8">${rows.length}</div>
+      <div style="font-size:11px;color:#1e40af;font-weight:600">Total Students</div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <table style="width:100%;border-collapse:collapse;margin-bottom:28px;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb">
+    <thead>
+      <tr style="background:${subColor};color:#fff">
+        <th style="padding:11px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">#</th>
+        <th style="padding:11px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Student Name</th>
+        <th style="padding:11px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Grade</th>
+        <th style="padding:11px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Status</th>
+        <th style="padding:11px 12px;text-align:right;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Amount</th>
+        <th style="padding:11px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Date Paid</th>
+      </tr>
+    </thead>
+    <tbody>${tableRows}</tbody>
+  </table>
+
+  <!-- Payment breakdown -->
+  <div style="display:flex;justify-content:flex-end;margin-bottom:32px">
+    <div style="min-width:300px;border:1.5px solid #e5e7eb;border-radius:14px;overflow:hidden">
+      <div style="background:#f9fafb;padding:10px 18px;display:flex;justify-content:space-between;border-bottom:1px solid #e5e7eb">
+        <span style="font-size:13px;color:#374151">Total Collected</span>
+        <span style="font-size:13px;font-weight:600;color:#111827">Rs. ${totalCollected.toLocaleString()}</span>
+      </div>
+      <div style="background:#fef2f2;padding:10px 18px;display:flex;justify-content:space-between;border-bottom:1px solid #fee2e2">
+        <span style="font-size:13px;color:#dc2626">Institute Commission (20%)</span>
+        <span style="font-size:13px;font-weight:600;color:#dc2626">− Rs. ${commission.toLocaleString()}</span>
+      </div>
+      <div style="background:${subColor};padding:14px 18px;display:flex;justify-content:space-between">
+        <span style="font-size:14px;font-weight:700;color:#fff">Net Payout to Teacher</span>
+        <span style="font-size:15px;font-weight:800;color:#fff">Rs. ${netPayout.toLocaleString()}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signatures -->
+  <div style="display:flex;gap:40px;padding-top:20px;border-top:1.5px dashed #d1d5db">
+    <div style="flex:1;text-align:center">
+      <div style="height:50px;border-bottom:1.5px solid #374151;margin-bottom:6px"></div>
+      <div style="font-size:12px;color:#6b7280">Teacher Signature</div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:2px">${teacher || 'Name: ___________________'}</div>
+    </div>
+    <div style="flex:1;text-align:center">
+      <div style="height:50px;border-bottom:1.5px solid #374151;margin-bottom:6px"></div>
+      <div style="font-size:12px;color:#6b7280">Authorized by Institute</div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:2px">Date: ___________________</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top:28px;text-align:center;padding:12px;background:#f9fafb;border-radius:10px">
+    <div style="font-size:11px;color:#9ca3af">Phoenix Education Institute • This is a computer-generated paysheet</div>
+    <div style="font-size:10px;color:#d1d5db;margin-top:2px">Generated on ${new Date().toLocaleString('en-GB')}</div>
+  </div>
+
+  <!-- Print button -->
+  <div class="no-print" style="text-align:center;margin-top:24px">
+    <button onclick="window.print()" style="padding:12px 36px;background:${subColor};color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">🖨️ Print / Save as PDF</button>
+  </div>
+
+</div>
+<script>window.onload=function(){window.print();}<\/script>
+</body></html>`;
+
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const win = window.open(url, '_blank');
+            if (!win) showToast('Allow pop-ups to download the paysheet', 'warning');
+            closeModal('paysheetModal');
+        };
 
         let students = [], payMap = {}, selMonth = '', selSubject = '';
         // payMap key = `${studentId}_${subject}`
