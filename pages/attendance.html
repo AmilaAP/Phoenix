@@ -263,8 +263,18 @@
                     && (!fg || String(s.grade) === fg);
             });
 
-            const presentIds = new Set(attRecs.map(r => r.studentId));
-            const attMap = {}; attRecs.forEach(r => attMap[r.studentId] = r);
+            // Group all records by studentId — one student can have multiple sessions
+            const sessionMap = {}; // studentId → [{ session, scannedAt }]
+            attRecs.forEach(r => {
+                if (!sessionMap[r.studentId]) sessionMap[r.studentId] = [];
+                sessionMap[r.studentId].push({ session: r.classSession || 'Class 1', scannedAt: r.scannedAt });
+            });
+            // Sort each student's sessions chronologically
+            Object.values(sessionMap).forEach(arr =>
+                arr.sort((a, b) => (a.scannedAt?.seconds || 0) - (b.scannedAt?.seconds || 0))
+            );
+
+            const presentIds = new Set(Object.keys(sessionMap));
             const present = filtered.filter(s => presentIds.has(s.id));
             const absent = filtered.filter(s => !presentIds.has(s.id));
             const rate = filtered.length ? Math.round(present.length / filtered.length * 100) : 0;
@@ -280,18 +290,38 @@
 
             let i = 0;
             tb.innerHTML = [...present, ...absent].map(s => {
-                i++; const rec = attMap[s.id]; const isP = !!rec;
+                i++;
+                const sessions = sessionMap[s.id] || [];
+                const isP = sessions.length > 0;
                 const ini = initials(s.firstName, s.lastName);
-                const t = isP ? formatTime(rec.scannedAt?.toDate?.() || rec.scannedAt) : '—';
                 const subs = getSubjects(s);
                 const subIcons = { Science: '🔬', Maths: '📐', Tamil: '📖', English: '📝' };
                 const subTxt = subs.map(sub => subIcons[sub] || sub[0]).join('');
+
+                // Build session badges
+                let sessionCell;
+                if (!isP) {
+                    sessionCell = '—';
+                } else if (sessions.length === 1) {
+                    const t = formatTime(sessions[0].scannedAt?.toDate?.() || sessions[0].scannedAt);
+                    sessionCell = `<span class="text-gray-400 text-xs">${t}</span>`;
+                } else {
+                    sessionCell = sessions.map(sess => {
+                        const t = formatTime(sess.scannedAt?.toDate?.() || sess.scannedAt);
+                        return `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-[10px] text-indigo-300 font-semibold whitespace-nowrap">${sess.session} <span class="text-gray-500 font-normal">${t}</span></span>`;
+                    }).join(' ');
+                }
+
+                const multiMark = sessions.length > 1
+                    ? `<span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded font-semibold ml-1">${sessions.length}×</span>`
+                    : '';
+
                 return `<tr class="border-b border-gray-800 hover:bg-gray-800/40 transition-colors">
       <td class="px-4 py-3 text-gray-600 text-xs">${i}</td>
       <td class="px-4 py-3">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-full ${isP ? 'bg-gradient-to-br from-indigo-500 to-violet-600' : 'bg-gray-800'} flex items-center justify-center text-xs font-bold text-white shrink-0">${ini}</div>
-          <div><div class="font-medium text-white text-sm">${s.firstName} ${s.lastName}</div>
+          <div><div class="font-medium text-white text-sm">${s.firstName} ${s.lastName}${multiMark}</div>
           <div class="text-xs text-gray-500">${s.school || ''}</div></div>
         </div>
       </td>
@@ -305,7 +335,9 @@
                         : '<span class="inline-flex px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-semibold border border-red-500/20">❌ Absent</span>'
                     }
       </td>
-      <td class="px-4 py-3 text-gray-500 text-xs hidden sm:table-cell">${t}</td>
+      <td class="px-4 py-3 text-gray-500 text-xs hidden sm:table-cell">
+        <div class="flex flex-wrap gap-1">${sessionCell}</div>
+      </td>
     </tr>`;
             }).join('');
         };
