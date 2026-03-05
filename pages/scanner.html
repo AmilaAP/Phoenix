@@ -167,7 +167,7 @@
                             <div class="flex items-center justify-between px-5 py-4 border-b border-gray-800">
                                 <div>
                                     <h2 class="font-semibold text-white text-sm">📷 Camera Scanner</h2>
-                                    <p class="text-xs text-gray-500 mt-0.5">Point at student QR code</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">Point camera at QR – any distance works</p>
                                 </div>
                                 <div class="flex gap-2">
                                     <button id="startBtn" onclick="startScan()"
@@ -179,9 +179,25 @@
                             </div>
                             <div class="p-4">
                                 <div id="reader" class="w-full bg-gray-950 rounded-xl overflow-hidden"
-                                    style="min-height:260px"></div>
-                                <p class="text-center text-[11px] text-gray-600 mt-3">📱 Best used on mobile – open this
-                                    page on your phone's browser</p>
+                                    style="min-height:280px"></div>
+                                <!-- Torch & Zoom controls -->
+                                <div class="flex items-center justify-between mt-3 gap-2">
+                                    <p class="text-[11px] text-gray-600">📱 Best on mobile – any distance, no alignment needed</p>
+                                    <div class="flex gap-2 shrink-0">
+                                        <button id="torchBtn" onclick="toggleTorch()"
+                                            class="hidden px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-yellow-500/20 hover:text-yellow-400 text-gray-400 text-[11px] font-medium transition-colors">
+                                            🔦 Light
+                                        </button>
+                                        <button id="zoomInBtn" onclick="adjustZoom(1)"
+                                            class="hidden px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-indigo-500/20 hover:text-indigo-400 text-gray-400 text-[11px] font-medium transition-colors">
+                                            🔍+
+                                        </button>
+                                        <button id="zoomOutBtn" onclick="adjustZoom(-1)"
+                                            class="hidden px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-indigo-500/20 hover:text-indigo-400 text-gray-400 text-[11px] font-medium transition-colors">
+                                            🔍−
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -307,15 +323,53 @@
         document.getElementById('scanDate').textContent =
             new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
+        let torchOn = false;
+        let currentZoom = 1;
+        let cameraCapabilities = null;
+        let activeTrack = null;
+
+        // Compute qrbox as 80% of the smaller dimension of the reader element
+        function getQrBox(viewfinderWidth, viewfinderHeight) {
+            const minDim = Math.min(viewfinderWidth, viewfinderHeight);
+            const size = Math.floor(minDim * 0.8);
+            return { width: size, height: size };
+        }
+
         window.startScan = function () {
             if (scanning) return; scanning = true;
             document.getElementById('startBtn').classList.add('hidden');
             document.getElementById('stopBtn').classList.remove('hidden');
-            scanner = new Html5Qrcode('reader');
-            scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 240, height: 240 } },
+            scanner = new Html5Qrcode('reader', {
+                experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+                verbose: false
+            });
+            scanner.start(
+                { facingMode: 'environment' },
+                {
+                    fps: 15,
+                    qrbox: getQrBox,
+                    aspectRatio: 1.0,
+                    disableFlip: false,
+                    formatsToSupport: [0] // QR_CODE format only — fastest
+                },
                 async (txt) => { if (busy) return; busy = true; await mark(txt.trim()); setTimeout(() => busy = false, 3000); },
                 () => { }
-            ).catch(e => {
+            ).then(() => {
+                // Expose torch & zoom if the device supports them
+                try {
+                    const stream = scanner?.getRunningTrackCameraCapabilities?.();
+                    if (stream) {
+                        cameraCapabilities = stream;
+                        if (cameraCapabilities.torchFeature?.isSupported()) {
+                            document.getElementById('torchBtn').classList.remove('hidden');
+                        }
+                        if (cameraCapabilities.zoomFeature?.isSupported()) {
+                            document.getElementById('zoomInBtn').classList.remove('hidden');
+                            document.getElementById('zoomOutBtn').classList.remove('hidden');
+                        }
+                    }
+                } catch (_) { }
+            }).catch(e => {
                 showToast('Camera error: ' + e, 'error'); scanning = false;
                 document.getElementById('startBtn').classList.remove('hidden');
                 document.getElementById('stopBtn').classList.add('hidden');
@@ -324,10 +378,38 @@
 
         window.stopScan = function () {
             scanner?.stop().then(() => {
-                scanner.clear(); scanning = false;
+                scanner.clear();
+                scanning = false;
+                torchOn = false;
+                currentZoom = 1;
+                cameraCapabilities = null;
                 document.getElementById('startBtn').classList.remove('hidden');
                 document.getElementById('stopBtn').classList.add('hidden');
+                document.getElementById('torchBtn').classList.add('hidden');
+                document.getElementById('zoomInBtn').classList.add('hidden');
+                document.getElementById('zoomOutBtn').classList.add('hidden');
             });
+        };
+
+        window.toggleTorch = function () {
+            if (!cameraCapabilities?.torchFeature?.isSupported()) return;
+            torchOn = !torchOn;
+            cameraCapabilities.torchFeature.apply(torchOn).then(() => {
+                const btn = document.getElementById('torchBtn');
+                btn.textContent = torchOn ? '🔦 Light On' : '🔦 Light';
+                btn.className = btn.className.replace(
+                    torchOn ? 'bg-gray-800' : 'bg-yellow-500/30',
+                    torchOn ? 'bg-yellow-500/30' : 'bg-gray-800'
+                );
+            }).catch(() => { });
+        };
+
+        window.adjustZoom = function (direction) {
+            if (!cameraCapabilities?.zoomFeature?.isSupported()) return;
+            const zf = cameraCapabilities.zoomFeature;
+            const step = (zf.max() - zf.min()) / 10 || 0.5;
+            currentZoom = Math.min(zf.max(), Math.max(zf.min(), currentZoom + direction * step));
+            zf.apply(currentZoom).catch(() => { });
         };
 
         window.markManual = async function () {
